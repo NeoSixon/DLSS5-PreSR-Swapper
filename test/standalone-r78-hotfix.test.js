@@ -20,7 +20,7 @@ test('library updates a managed backend in place instead of restore then install
   const preload = read('standalone/preload.js');
   const updater = read('standalone/core/backend-update.js');
   const optiscaler = read('standalone/core/optiscaler.js');
-  assert.match(compat, /MANAGER_BACKEND_ID = '0\.7\.7-dlss5mgr7'/);
+  assert.match(compat, /MANAGER_BACKEND_ID = '0\.7\.7-dlss5mgr8'/);
   assert.match(compat, /needsBackendUpdate/);
   assert.match(compat, /window\.nrApp\.updateBackend\(game\.id\)/);
   assert.doesNotMatch(compat, /window\.nrApp\.restore\(game\.id\)/);
