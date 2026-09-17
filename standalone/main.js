@@ -46,10 +46,11 @@ let folderSelectionGeneration = 0;
 
 const stateFile = () => path.join(app.getPath('userData'), 'standalone-library.json');
 const idFor = exePath => crypto.createHash('sha1').update(path.resolve(exePath).toLowerCase()).digest('hex').slice(0, 16);
+const normalizedExePath = exePath => path.resolve(String(exePath)).toLowerCase();
 const settingsFor = value => ({ ...DEFAULT_GAME_SETTINGS, ...(value || {}) });
 
 function defaultState() {
-  return { language: 'en', selectedGameId: null, games: [] };
+  return { language: 'en', selectedGameId: null, games: [], ignoredPaths: [] };
 }
 
 function loadState() {
@@ -58,6 +59,9 @@ function loadState() {
     const parsed = JSON.parse(fs.readFileSync(stateFile(), 'utf8'));
     if (parsed && typeof parsed === 'object' && Array.isArray(parsed.games)) {
       liveState = { ...defaultState(), ...parsed };
+      liveState.ignoredPaths = Array.isArray(liveState.ignoredPaths)
+        ? [...new Set(liveState.ignoredPaths.map(normalizedExePath))]
+        : [];
       return liveState;
     }
   } catch {}
@@ -221,7 +225,8 @@ async function discoverAndMerge(refreshAll = false) {
   let added = 0;
   for (const game of found) {
     const candidate = normalizeRecord(game.exePath, game);
-    const existing = state.games.find(record => path.resolve(record.exePath).toLowerCase() === path.resolve(candidate.exePath).toLowerCase());
+    if (state.ignoredPaths.includes(normalizedExePath(candidate.exePath))) continue;
+    const existing = state.games.find(record => normalizedExePath(record.exePath) === normalizedExePath(candidate.exePath));
     if (existing) {
       existing.displayName = game.displayName || existing.displayName;
       existing.launcher = game.launcher || existing.launcher;
@@ -332,6 +337,8 @@ function addExecutable(exePath, meta = {}) {
   if (!/\.exe$/i.test(exePath) || !fs.statSync(exePath).isFile()) throw new Error('Choose a valid game executable.');
   const record = normalizeRecord(exePath, meta);
   const state = loadState();
+  const normalizedPath = normalizedExePath(record.exePath);
+  state.ignoredPaths = state.ignoredPaths.filter(item => item !== normalizedPath);
   const existing = state.games.find(game => game.id === record.id);
   // Re-adding restores visibility without discarding favorites, launcher IDs or backups.
   if (existing) existing.hidden = false;
@@ -393,8 +400,19 @@ function setHidden(id, hidden) {
   saveState();
   return viewState();
 }
-// Keep the old IPC name safe for legacy callers: never delete files or the record.
-ipcMain.handle('games:remove', (_event, id) => safeResult(() => setHidden(id, true)));
+function removeFromLibrary(id) {
+  const state = loadState();
+  const record = recordFor(id);
+  if (!record) throw new Error('Unknown game');
+  state.games = state.games.filter(game => game.id !== id);
+  state.ignoredPaths = [...new Set([...state.ignoredPaths, normalizedExePath(record.exePath)])];
+  inspectionCache.delete(id);
+  if (state.selectedGameId === id) state.selectedGameId = state.games.find(game => !game.hidden)?.id || null;
+  saveState();
+  return viewState();
+}
+// Remove only the library entry. The executable and every game-side file stay untouched.
+ipcMain.handle('games:remove', (_event, id) => safeResult(() => removeFromLibrary(id)));
 ipcMain.handle('games:set-hidden', (_event, id, hidden) => safeResult(() => setHidden(id, hidden)));
 ipcMain.handle('games:set-favorite', (_event, id, favorite) => safeResult(async () => {
   const record = recordFor(id);
@@ -414,7 +432,8 @@ ipcMain.handle('games:context-menu', (_event, id) => safeResult(() => {
       item(record.favorite ? (zh ? '取消收藏' : 'Remove from favorites') : (zh ? '添加至收藏夹' : 'Add to favorites'), 'favorite'),
       item(zh ? '浏览本地文件' : 'Browse local files', 'folder'),
       { type: 'separator' },
-      item(record.hidden ? (zh ? '取消隐藏' : 'Unhide') : (zh ? '隐藏（不删除游戏文件）' : 'Hide (keep game files)'), 'hidden')
+      item(record.hidden ? (zh ? '取消隐藏' : 'Unhide') : (zh ? '隐藏（不删除游戏文件）' : 'Hide (keep game files)'), 'hidden'),
+      item(zh ? '从游戏库移除（保留游戏文件）' : 'Remove from library (keep game files)', 'remove')
     ]).popup({ window: win, callback: () => resolve(null) });
   });
 }));

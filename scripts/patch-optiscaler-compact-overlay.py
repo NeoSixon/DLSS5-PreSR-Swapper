@@ -49,8 +49,11 @@ SHORTCUTS_REPLACEMENT = r"""void MenuCommon::HandleMenuShortcuts(RenderMenuConte
     auto& state = ctx.state;
     auto config = ctx.config;
     auto& io = ctx.io;
-    if (io.DisplaySize.x <= 0.0f || io.DisplaySize.y <= 0.0f)
-        return;
+
+    // Handle the hotkey before the first ImGui frame. When the manager is
+    // closed, DisplaySize can still be zero because BeginFrame has not run.
+    // Returning here makes the first press appear to do nothing on a cold
+    // start; toggling the manager first lets the normal frame setup follow.
 
     if (inputFG)
     {

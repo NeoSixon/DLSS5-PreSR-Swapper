@@ -67,3 +67,18 @@ test('manager backend revision is mgr7 everywhere user-facing update detection r
     assert.match(read(rel), /0\.7\.7-dlss5mgr7/, `${rel} should use mgr7`);
   }
 });
+
+test('manager shortcut is handled before the first ImGui frame', () => {
+  const patch = read('scripts/patch-optiscaler-compact-overlay.py');
+  assert.match(patch, /Handle the hotkey before the first ImGui frame/);
+  assert.doesNotMatch(patch, /if \(io\.DisplaySize\.x <= 0\.0f \|\| io\.DisplaySize\.y <= 0\.0f\)\s*return;/);
+});
+
+test('add-game source buttons are neutral until the user points to one', () => {
+  const dialog = read('standalone/renderer/library-dialog.js');
+  const styles = read('standalone/renderer/library-actions.css');
+  assert.doesNotMatch(dialog, /chooseGameFolderBtn[^\n]+class="primary"/);
+  assert.doesNotMatch(dialog, /chooseGameFolderBtn[^\n]+autofocus/);
+  assert.match(dialog, /dialog\.setAttribute\('tabindex', '-1'\)/);
+  assert.match(styles, /\.add-game-sources \.add-game-source:hover/);
+});

@@ -58,6 +58,7 @@
     launching: '已发送游戏启动请求。',
     hiddenNotice: '已隐藏，游戏文件和配置均保留；可在“已隐藏”中取消隐藏。',
     unhiddenNotice: '游戏已恢复显示。',
+    removedNotice: '已从游戏库移除，游戏文件未改动。',
     compatibleTag: '兼容',
     incompatibleTag: '不兼容',
     configuredTag: '已配置',
@@ -82,6 +83,7 @@
     launching: 'Game launch requested.',
     hiddenNotice: 'Hidden. Game files and settings are untouched. Unhide it from the Hidden filter.',
     unhiddenNotice: 'Game is visible again.',
+    removedNotice: 'Removed from the library. Game files were not changed.',
     compatibleTag: 'Compatible',
     incompatibleTag: 'Not compatible',
     configuredTag: 'Configured',
@@ -228,6 +230,9 @@
         } else if (action === 'hidden') {
           state = unwrap(await window.nrApp.setGameHidden(game.id, !current.hidden));
           toast(current.hidden ? copy().unhiddenNotice : copy().hiddenNotice);
+        } else if (action === 'remove') {
+          state = unwrap(await window.nrApp.removeGame(game.id));
+          toast(copy().removedNotice);
         }
       });
     } catch (error) { toast(error.message || String(error)); }

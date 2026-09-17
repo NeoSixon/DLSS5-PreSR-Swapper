@@ -105,20 +105,32 @@ test('hide and favorite survive rescan/restart and never touch game files or bac
   assert.equal(fs.readFileSync(backup, 'utf8'), 'keep original backup');
 });
 
-test('legacy remove only hides, and re-adding preserves favorites and launcher identity', async t => {
+test('remove clears only the library entry, keeps files, and blocks automatic rediscovery', async t => {
   const app = harness(t);
+  const config = path.join(path.dirname(app.exeA), 'OptiScaler.ini');
+  const backup = path.join(path.dirname(app.exeA), '_dlss5_backup', 'original.dll');
+  fs.mkdirSync(path.dirname(backup));
+  fs.writeFileSync(config, 'keep config byte-for-byte');
+  fs.writeFileSync(backup, 'keep original backup');
   const state = await app.call('app:get-state');
   const id = state.games[0].id;
   await app.call('games:set-favorite', id, true);
-  await app.call('games:remove', id);
+  const removed = await app.call('games:remove', id);
+  assert.equal(removed.games.length, 1);
+  assert.equal(removed.games.some(game => game.id === id), false);
+  assert.equal(fs.readFileSync(app.exeA, 'utf8'), 'fixture');
+  assert.equal(fs.readFileSync(config, 'utf8'), 'keep config byte-for-byte');
+  assert.equal(fs.readFileSync(backup, 'utf8'), 'keep original backup');
+  const rescanned = await app.call('games:rescan');
+  assert.equal(rescanned.added, 0);
+  assert.equal(rescanned.state.games.length, 1);
   app.dialogs.push({ canceled: false, filePaths: [app.exeA] });
   const next = await app.call('games:add');
   const record = next.games.find(game => game.id === id);
   assert.equal(next.games.length, 2);
-  assert.equal(record.favorite, true);
+  assert.equal(record.favorite, false);
   assert.equal(record.hidden, false);
-  assert.equal(record.launcher, 'Steam');
-  assert.equal(record.storeId, '123');
+  assert.equal(record.launcher, 'Manual');
   const cancelled = await app.call('games:add');
   assert.equal(cancelled.cancelled, true);
 });
@@ -142,13 +154,14 @@ test('context menu is localized, reversible and dismissing it performs no action
   const id = state.games[0].id;
   await app.call('app:set-language', 'zh-CN');
   assert.equal(await app.call('games:context-menu', id), null);
-  assert.deepEqual(Array.from(app.menu.filter(item => item.label), item => item.label), ['开始游戏', '添加至收藏夹', '浏览本地文件', '隐藏（不删除游戏文件）']);
+  assert.deepEqual(Array.from(app.menu.filter(item => item.label), item => item.label), ['开始游戏', '添加至收藏夹', '浏览本地文件', '隐藏（不删除游戏文件）', '从游戏库移除（保留游戏文件）']);
   await app.call('games:set-favorite', id, true);
   await app.call('games:set-hidden', id, true);
   app.menuIndex = 1;
   assert.equal(await app.call('games:context-menu', id), 'favorite');
   assert.equal(app.menu[1].label, '取消收藏');
   assert.equal(app.menu[4].label, '取消隐藏');
+  assert.equal(app.menu[5].label, '从游戏库移除（保留游戏文件）');
   app.electron.shell.openPath = async () => 'Folder unavailable';
   const error = await app.handlers.get('game:open-folder')(null, id);
   assert.equal(error.ok, false);

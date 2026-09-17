@@ -35,11 +35,12 @@
     const c = copy();
     const dialog = document.createElement('dialog');
     dialog.className = 'add-game-dialog';
+    dialog.setAttribute('tabindex', '-1');
     dialog.setAttribute('aria-labelledby', 'addGameTitle');
     dialog.setAttribute('aria-describedby', 'addGameHelp');
     // Static markup only. All paths and executable names are inserted as text.
     dialog.innerHTML = `<h2 id="addGameTitle"></h2><p id="addGameHelp"></p>
-      <div class="add-game-sources"><button id="chooseGameFolderBtn" class="primary" type="button" autofocus></button><button id="chooseGameExeBtn" class="ghost" type="button"></button></div>
+      <div class="add-game-sources"><button id="chooseGameFolderBtn" class="ghost add-game-source" type="button"></button><button id="chooseGameExeBtn" class="ghost add-game-source" type="button"></button></div>
       <p class="add-game-root"></p><p class="add-game-status" role="status" aria-live="polite"></p>
       <div class="exe-candidates" role="radiogroup"></div>
       <div class="add-game-footer"><button id="cancelAddGameBtn" class="ghost" type="button"></button><button id="confirmAddGameBtn" class="primary" type="button" hidden></button></div>`;
@@ -158,5 +159,8 @@
     document.body.appendChild(dialog);
     activeDialog = dialog;
     dialog.showModal();
+    // Keep either source neutral until the pointer or keyboard explicitly
+    // chooses it; the first action should not look preselected.
+    dialog.focus({ preventScroll: true });
   };
 })();

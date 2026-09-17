@@ -11,6 +11,9 @@
 .add-game-dialog h2 { margin: 0 0 12px; font-size: 23px; }
 .add-game-dialog p { font-size: 14px; line-height: 1.55; color: #b8c5cf; }
 .add-game-sources, .add-game-footer { display: flex; flex-wrap: wrap; gap: 12px; }
+.add-game-sources .add-game-source { background: rgba(255,255,255,.042); border: 1px solid rgba(255,255,255,.085); color: #d5dde4; box-shadow: none; }
+.add-game-sources .add-game-source:hover, .add-game-sources .add-game-source:focus-visible { background: rgba(152,239,114,.13); border-color: rgba(152,239,114,.42); color: #eaf7e5; box-shadow: 0 0 0 2px rgba(152,239,114,.10); }
+.add-game-sources .add-game-source:focus:not(:focus-visible) { outline: none; }
 .add-game-footer { justify-content: flex-end; margin-top: 20px; }
 .add-game-dialog button { min-height: 40px; padding: 9px 16px; cursor: pointer; }
 .add-game-dialog button[hidden] { display: none; }
