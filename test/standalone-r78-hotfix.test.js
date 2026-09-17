@@ -10,7 +10,7 @@ const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
 
 test('manager backend revision enables the documented safe input fallback', () => {
   const optiscaler = read('standalone/core/optiscaler.js');
-  assert.match(optiscaler, /packageId: '0\.7\.7-dlss5mgr7'/);
+  assert.match(optiscaler, /packageId: '0\.7\.7-dlss5mgr8'/);
   assert.match(optiscaler, /\['Hotfix', 'ManualInputPolling', 'true'\]/);
   assert.match(optiscaler, /\['Hotfix', 'CheckForUpdate', 'false'\]/);
 });
