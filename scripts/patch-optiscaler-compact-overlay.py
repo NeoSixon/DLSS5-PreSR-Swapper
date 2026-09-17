@@ -55,6 +55,33 @@ SHORTCUTS_REPLACEMENT = r"""void MenuCommon::HandleMenuShortcuts(RenderMenuConte
     // Returning here makes the first press appear to do nothing on a cold
     // start; toggling the manager first lets the normal frame setup follow.
 
+    // OptiInput normally supplies a release edge from the game's message/raw-input
+    // path. Some games keep that path disconnected (the game still renders the
+    // overlay, but no key release reaches OptiInput), so supplement it with a
+    // focused physical-key edge. This is only an edge detector: holding the key
+    // cannot repeatedly toggle the panel.
+    static int physicalShortcutKey = 0;
+    static bool physicalShortcutDown = false;
+    const int shortcutKey = config->ShortcutKey.value_or_default();
+    const bool physicalDown = OptiInput::IsFocused() && shortcutKey > 0 && shortcutKey < 256 &&
+                              ((::GetAsyncKeyState(shortcutKey) & 0x8000) != 0 ||
+                               (::GetKeyState(shortcutKey) & 0x8000) != 0);
+    if (shortcutKey != physicalShortcutKey)
+    {
+        physicalShortcutKey = shortcutKey;
+        physicalShortcutDown = physicalDown;
+    }
+    else if (physicalDown && !physicalShortcutDown)
+    {
+        inputMenu = true;
+        physicalShortcutDown = true;
+        LOG_DEBUG("DLSS 5 Manager physical shortcut detected: {}", shortcutKey);
+    }
+    else if (!physicalDown)
+    {
+        physicalShortcutDown = false;
+    }
+
     if (inputFG)
     {
         inputFG = false;
