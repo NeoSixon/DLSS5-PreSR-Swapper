@@ -116,7 +116,7 @@ test('later-pass auto skin mask only shows a restore icon after an override', ()
   const patch = read('scripts/patch-optiscaler-compact-overlay.py');
   const fix = read('scripts/fix-optiscaler-manager-overlay-compile.py');
   assert.match(patch, /inherit && autoMask->has_value\(\)/);
-  assert.match(patch, /InvisibleButton\("##RestoreAutoMask"/);
+  assert.match(patch, /restoreIcon\("##RestoreAutoMask"/);
   assert.match(patch, /Restore the Pass 1 setting\./);
   assert.doesNotMatch(patch, /Reset##AutoMask/);
   assert.match(fix, /恢复为第 1 层设置/);
