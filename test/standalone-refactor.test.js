@@ -139,6 +139,16 @@ test('standalone shell uses the NR wordmark instead of the legacy green 5 tile',
   assert.match(css, /\.brand-five\{font-weight:850\}/);
 });
 
+test('desktop brand keeps the connected NR mark and does not duplicate DLSS5 at runtime', () => {
+  const html = read('standalone/renderer/index.html');
+  const ux = read('standalone/renderer/ux-fixes.js');
+  assert.match(html, /M8 46V10L40 46V10H68/);
+  assert.match(ux, /querySelector\('\.brand-dlss'\)/);
+  assert.match(ux, /querySelector\('\.brand-five'\)/);
+  assert.doesNotMatch(ux, /querySelector\('\.brand strong'\)/);
+  assert.doesNotMatch(ux, /brandTitle\.textContent = 'DLSS 5'/);
+});
+
 test('standalone build generates and uses its own NR application icon', () => {
   const pkg = JSON.parse(read('package.json'));
   const main = read('standalone/main.js');
@@ -150,7 +160,9 @@ test('standalone build generates and uses its own NR application icon', () => {
   assert.match(iconScript, /DLSS 5 Neural Rendering Manager standalone icon/);
   assert.match(iconScript, /build\/icon\.ico|icon\.ico/);
   assert.match(iconScript, /app-icon\.png/);
-  assert.match(iconScript, /stroke-width="46"/);
+  assert.match(iconScript, /stroke-width="52"/);
+  assert.match(iconScript, /M246 674V350L454 674V350H626/);
+  assert.match(iconScript, /id="blade"/);
   assert.doesNotMatch(iconScript, /stroke-width="60"/);
 });
 

@@ -14,25 +14,57 @@ const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
-    <radialGradient id="ambient" cx="50%" cy="52%" r="54%">
-      <stop offset="0" stop-color="#69f05d" stop-opacity=".08"/>
-      <stop offset=".78" stop-color="#69f05d" stop-opacity=".015"/>
-      <stop offset="1" stop-color="#69f05d" stop-opacity="0"/>
+    <linearGradient id="bg" x1="120" y1="90" x2="900" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18232d"/>
+      <stop offset=".46" stop-color="#0b1219"/>
+      <stop offset="1" stop-color="#05090d"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="110" y1="100" x2="920" y2="920" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#50616c" stop-opacity=".76"/>
+      <stop offset=".48" stop-color="#1f2a31" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#5cf34d" stop-opacity=".58"/>
+    </linearGradient>
+    <linearGradient id="blade" x1="930" y1="92" x2="610" y2="560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b5ff7a"/>
+      <stop offset=".34" stop-color="#69f04f"/>
+      <stop offset="1" stop-color="#257f27" stop-opacity=".08"/>
+    </linearGradient>
+    <linearGradient id="nr" x1="235" y1="350" x2="790" y2="685" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a4ff78"/>
+      <stop offset=".46" stop-color="#67f252"/>
+      <stop offset="1" stop-color="#4bdc43"/>
+    </linearGradient>
+    <radialGradient id="ambient" cx="68%" cy="42%" r="56%">
+      <stop offset="0" stop-color="#69f04f" stop-opacity=".13"/>
+      <stop offset=".55" stop-color="#69f04f" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#69f04f" stop-opacity="0"/>
     </radialGradient>
-    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="8"/>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="13"/>
     </filter>
   </defs>
-  <rect x="82" y="82" width="860" height="860" rx="186" fill="#081117" stroke="#35683c" stroke-opacity=".58" stroke-width="8"/>
-  <circle cx="512" cy="526" r="304" fill="url(#ambient)"/>
-  <g fill="none" stroke="#72f45a" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" opacity=".16" filter="url(#softGlow)">
-    <path d="M255 660V364L455 660V364"/>
-    <path d="M565 660V364H700L776 404V500L700 540H565M700 540L792 672"/>
-  </g>
-  <g fill="none" stroke="#72f45a" stroke-width="46" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M255 660V364L455 660V364"/>
-    <path d="M565 660V364H700L776 404V500L700 540H565M700 540L792 672"/>
-  </g>
+
+  <rect x="70" y="70" width="884" height="884" rx="210" fill="url(#bg)"/>
+  <rect x="76" y="76" width="872" height="872" rx="204" fill="none" stroke="url(#edge)" stroke-width="9"/>
+  <ellipse cx="610" cy="470" rx="355" ry="330" fill="url(#ambient)"/>
+
+  <path d="M760 76H928V238L672 494L620 410Z" fill="url(#blade)" opacity=".86"/>
+  <path d="M781 77H928V176L650 455" fill="none" stroke="#d7ffae" stroke-opacity=".24" stroke-width="10"/>
+
+  <path d="M246 674V350L454 674V350H626
+           C708 350 760 393 760 457
+           C760 522 708 557 626 557H454
+           M620 557L792 686"
+        fill="none" stroke="#0b120d" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"
+        opacity=".72" filter="url(#shadow)"/>
+  <path d="M246 674V350L454 674V350H626
+           C708 350 760 393 760 457
+           C760 522 708 557 626 557H454
+           M620 557L792 686"
+        fill="none" stroke="url(#nr)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M246 674V350L454 674V350H626"
+        fill="none" stroke="#d7ffbd" stroke-width="7" stroke-linecap="round" opacity=".15"/>
 </svg>`;
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>

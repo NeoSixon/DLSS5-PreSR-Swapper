@@ -276,7 +276,7 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         const ImVec2 brandAt = ImGui::GetCursorScreenPos();
         ImDrawList* draw = ImGui::GetWindowDrawList();
         const float headerHeight = 32.0f * scale;
-        const float nrWidth = 48.0f * scale;
+        const float nrWidth = 44.0f * scale;
         const float nrStroke = std::max(2.0f, 3.0f * scale);
         const ImU32 nrShadow = ImGui::GetColorU32(ImVec4(0.42f, 1.00f, 0.30f, 0.12f));
         const ImU32 nrGreen = ImGui::GetColorU32(ImVec4(0.42f, 0.96f, 0.30f, 1.0f));
@@ -299,13 +299,13 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         wordmarkLine(ImVec2(nx0, top), ImVec2(nx1, bottom));
         wordmarkLine(ImVec2(nx1, bottom), ImVec2(nx1, top));
 
-        const float rx0 = brandAt.x + 29.0f * scale;
-        const float rx1 = brandAt.x + 44.0f * scale;
-        wordmarkLine(ImVec2(rx0, bottom), ImVec2(rx0, top));
+        // The N's right stem is also the R's left stem.
+        const float rx0 = nx1;
+        const float rx1 = brandAt.x + 36.0f * scale;
         wordmarkLine(ImVec2(rx0, top), ImVec2(rx1, top));
         wordmarkLine(ImVec2(rx1, top), ImVec2(rx1, mid));
         wordmarkLine(ImVec2(rx1, mid), ImVec2(rx0, mid));
-        wordmarkLine(ImVec2(rx0 + 8.0f * scale, mid), ImVec2(rx1 + 3.0f * scale, bottom));
+        wordmarkLine(ImVec2(rx0 + 8.0f * scale, mid), ImVec2(brandAt.x + 43.0f * scale, bottom));
 
         const float titleX = brandAt.x + nrWidth + 12.0f * scale;
         const ImVec2 dlssSize = ImGui::CalcTextSize("DLSS");

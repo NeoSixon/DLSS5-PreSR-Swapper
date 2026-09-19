@@ -10,10 +10,10 @@
   document.querySelector('#page-settings .page-heading p')?.remove();
   document.title = 'DLSS 5 Neural Rendering Manager';
 
-  const brandLogo = document.querySelector('.brand .logo');
-  const brandTitle = document.querySelector('.brand strong');
-  if (brandLogo) brandLogo.textContent = '5';
-  if (brandTitle) brandTitle.textContent = 'DLSS 5';
+  const brandDlss = document.querySelector('.brand-dlss');
+  const brandFive = document.querySelector('.brand-five');
+  if (brandDlss) brandDlss.textContent = 'DLSS';
+  if (brandFive) brandFive.textContent = '5';
 
   const homePage = document.getElementById('page-home');
   if (homePage) {

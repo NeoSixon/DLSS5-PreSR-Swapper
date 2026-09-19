@@ -7,8 +7,8 @@
 button,input,select{font:inherit}.hidden{display:none!important}
 .app-shell{height:100vh;display:grid;grid-template-columns:205px 1fr;background:linear-gradient(135deg,rgba(8,15,22,.97),rgba(14,19,26,.94));border:1px solid rgba(255,255,255,.12);overflow:hidden}
 .sidebar{padding:24px 18px 18px;border-right:1px solid rgba(255,255,255,.07);background:linear-gradient(180deg,rgba(22,31,39,.76),rgba(14,21,28,.46));backdrop-filter:blur(30px);display:flex;flex-direction:column}
-.brand{display:flex;align-items:center;gap:11px;min-height:50px;padding:8px 10px 26px}
-.brand-mark{width:48px;height:30px;flex:0 0 auto;overflow:visible;filter:drop-shadow(0 0 5px rgba(104,241,88,.14))}
+.brand{display:flex;align-items:center;gap:12px;min-height:50px;padding:8px 10px 26px}
+.brand-mark{width:50px;height:30px;flex:0 0 auto;overflow:visible;filter:drop-shadow(0 0 4px rgba(104,241,88,.12))}
 .brand-mark path{fill:none;stroke:#72f45a;stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round}
 .brand-title{display:inline-flex;align-items:baseline;font-size:18px;letter-spacing:.01em;color:#f4f7fa;white-space:nowrap}.brand-dlss{font-weight:350}.brand-five{font-weight:850}
 .nav{display:grid;gap:8px}.nav-item{appearance:none;border:0;background:transparent;color:#c9d2da;text-align:left;padding:13px 14px;border-radius:16px;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:650;cursor:pointer;transition:.18s}.nav-item span{width:20px;text-align:center}.nav-item:hover{background:rgba(255,255,255,.055)}.nav-item.active{color:white;background:linear-gradient(90deg,rgba(151,239,114,.14),rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px rgba(154,239,119,.12)}
