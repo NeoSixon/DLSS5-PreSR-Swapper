@@ -105,7 +105,16 @@
   function ensureLibraryToolbar() {
     const heading = gamesPage?.querySelector('.page-heading');
     const add = document.getElementById('addGameBtn');
-    if (!heading || !add?.parentElement) return;
+    if (!heading || !add) return;
+
+    let actions = document.getElementById('libraryHeadingActions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.id = 'libraryHeadingActions';
+      actions.className = 'library-heading-actions';
+      heading.appendChild(actions);
+    }
+    if (add.parentElement !== actions) actions.appendChild(add);
 
     let scan = document.getElementById('rescanGamesBtn');
     if (!scan) {
@@ -113,9 +122,9 @@
       scan.id = 'rescanGamesBtn';
       scan.type = 'button';
       scan.className = 'ghost compact scan-button';
-      add.parentElement.insertBefore(scan, add);
       scan.addEventListener('click', () => scanGames());
     }
+    if (scan.parentElement !== actions) actions.insertBefore(scan, add);
 
     let searchRow = document.getElementById('librarySearchRow');
     if (!searchRow) {
