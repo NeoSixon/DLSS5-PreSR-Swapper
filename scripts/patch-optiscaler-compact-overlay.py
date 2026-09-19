@@ -62,6 +62,7 @@ SHORTCUTS_REPLACEMENT = r"""void MenuCommon::HandleMenuShortcuts(RenderMenuConte
     // cannot repeatedly toggle the panel.
     static int physicalShortcutKey = 0;
     static bool physicalShortcutDown = false;
+    static bool suppressNativeShortcutRelease = false;
     const int shortcutKey = config->ShortcutKey.value_or_default();
     const bool physicalDown = OptiInput::IsFocused() && shortcutKey > 0 && shortcutKey < 256 &&
                               ((::GetAsyncKeyState(shortcutKey) & 0x8000) != 0 ||
@@ -70,16 +71,28 @@ SHORTCUTS_REPLACEMENT = r"""void MenuCommon::HandleMenuShortcuts(RenderMenuConte
     {
         physicalShortcutKey = shortcutKey;
         physicalShortcutDown = physicalDown;
+        suppressNativeShortcutRelease = false;
     }
     else if (physicalDown && !physicalShortcutDown)
     {
         inputMenu = true;
         physicalShortcutDown = true;
+        suppressNativeShortcutRelease = true;
         LOG_DEBUG("DLSS 5 Manager physical shortcut detected: {}", shortcutKey);
     }
     else if (!physicalDown)
     {
         physicalShortcutDown = false;
+    }
+
+    // A physical key-down above already owns this key cycle. OptiInput may also
+    // report the same press on key release; consume that paired edge so one
+    // Insert press cannot open the manager and then close it again on release.
+    if (suppressNativeShortcutRelease && !physicalDown && inputMenu)
+    {
+        inputMenu = false;
+        suppressNativeShortcutRelease = false;
+        LOG_DEBUG("DLSS 5 Manager ignored duplicate native shortcut release: {}", shortcutKey);
     }
 
     if (inputFG)

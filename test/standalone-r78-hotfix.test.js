@@ -10,7 +10,7 @@ const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
 
 test('manager backend revision enables the documented safe input fallback', () => {
   const optiscaler = read('standalone/core/optiscaler.js');
-  assert.match(optiscaler, /packageId: '0\.7\.7-dlss5mgr8'/);
+  assert.match(optiscaler, /packageId: '0\.7\.7-dlss5mgr9'/);
   assert.match(optiscaler, /\['Hotfix', 'ManualInputPolling', 'true'\]/);
   assert.match(optiscaler, /\['Hotfix', 'CheckForUpdate', 'false'\]/);
 });
@@ -20,7 +20,7 @@ test('library updates a managed backend in place instead of restore then install
   const preload = read('standalone/preload.js');
   const updater = read('standalone/core/backend-update.js');
   const optiscaler = read('standalone/core/optiscaler.js');
-  assert.match(compat, /MANAGER_BACKEND_ID = '0\.7\.7-dlss5mgr8'/);
+  assert.match(compat, /MANAGER_BACKEND_ID = '0\.7\.7-dlss5mgr9'/);
   assert.match(compat, /needsBackendUpdate/);
   assert.match(compat, /window\.nrApp\.updateBackend\(game\.id\)/);
   assert.doesNotMatch(compat, /window\.nrApp\.restore\(game\.id\)/);
@@ -71,4 +71,12 @@ test('language picker switches immediately and syncs the in-game overlay', () =>
   assert.ok(persist > optimistic, 'visible language changes before IPC persistence finishes');
   assert.ok(overlaySync > persist, 'in-game overlay language follows persisted desktop language');
   assert.doesNotMatch(compat, /window\.location\.reload\(\)/);
+});
+
+test('physical shortcut suppresses the duplicate native release edge', () => {
+  const patch = read('scripts/patch-optiscaler-compact-overlay.py');
+  assert.match(patch, /static bool suppressNativeShortcutRelease = false/);
+  assert.match(patch, /suppressNativeShortcutRelease = true/);
+  assert.match(patch, /suppressNativeShortcutRelease && !physicalDown && inputMenu/);
+  assert.match(patch, /ignored duplicate native shortcut release/);
 });
