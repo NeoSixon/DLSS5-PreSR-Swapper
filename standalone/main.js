@@ -2,6 +2,7 @@
 
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
 const SUPPORT_URL = 'https://buymeacoffee.com/NeoSixon';
+const GITHUB_URL = 'https://github.com/NeoSixon/DLSS5-PreSR-Swapper';
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -529,6 +530,10 @@ ipcMain.handle('game:restore', (_event, id) => safeResult(async () => {
 
 ipcMain.handle('app:open-support', () => safeResult(async () => {
   await shell.openExternal(SUPPORT_URL);
+  return true;
+}));
+ipcMain.handle('app:open-github', () => safeResult(async () => {
+  await shell.openExternal(GITHUB_URL);
   return true;
 }));
 

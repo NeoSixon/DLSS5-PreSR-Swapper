@@ -5,10 +5,14 @@
   polish.rel = 'stylesheet';
   polish.href = 'compact-ui.css';
   document.head.appendChild(polish);
+  const nvidiaTheme = document.createElement('link');
+  nvidiaTheme.rel = 'stylesheet';
+  nvidiaTheme.href = 'nvidia-ui.css';
+  document.head.appendChild(nvidiaTheme);
 
   document.querySelector('.sidebar-foot')?.remove();
   document.querySelector('#page-settings .page-heading p')?.remove();
-  document.title = 'DLSS 5 Neural Rendering Manager';
+  document.title = 'DLSS5 Pre-SR Manager';
 
   const brandDlss = document.querySelector('.brand-dlss');
   const brandFive = document.querySelector('.brand-five');
@@ -18,27 +22,18 @@
   const homePage = document.getElementById('page-home');
   if (homePage) {
     homePage.innerHTML = `
-      <section class="home-library-toolbar glass-card">
-        <div class="home-library-copy">
-          <span class="home-kicker">DLSS 5</span>
-          <h1 id="homeHeadline">Game Library</h1>
-          <p id="homeDescription">Installed games from your launchers, with DLSS 5 compatibility shown at a glance.</p>
+      <div class="home-v20-heading"><h1 id="homeHeadline">Home</h1></div>
+      <section class="home-v20-section">
+        <div class="home-v20-section-head">
+          <h2 id="homeCurrentTitle">Current game</h2>
+          <button class="home-view-all" id="homeOpenGamesBtn">Library <span>→</span></button>
         </div>
-        <div class="home-actions">
-          <button class="primary home-scan-button" id="homeScanBtn">Scan games</button>
-          <button class="ghost home-add-button" id="homeAddBtn">Add game</button>
-        </div>
-        <span class="home-scan-status" id="homeScanStatus"></span>
+        <div class="home-game-grid home-v20-grid" id="homeCurrentGrid"></div>
       </section>
-      <section class="home-library-section">
-        <div class="home-library-title">
-          <div><h2 id="homeLibraryTitle">Installed games</h2><p id="homeLibraryMeta">0 games</p></div>
-          <button class="home-view-all" id="homeOpenGamesBtn">View all <span>→</span></button>
-        </div>
-        <div class="home-game-grid" id="homeGameGrid"></div>
+      <section class="home-v20-section">
+        <div class="home-v20-section-head"><h2 id="homeFavoriteTitle">Favorites</h2></div>
+        <div class="home-game-grid home-v20-grid" id="homeFavoriteGrid"></div>
       </section>`;
-    document.getElementById('homeScanBtn')?.addEventListener('click', () => scanGames());
-    document.getElementById('homeAddBtn')?.addEventListener('click', () => addGame());
     document.getElementById('homeOpenGamesBtn')?.addEventListener('click', () => showPage('games'));
   }
 
@@ -64,25 +59,27 @@
   };
 
   const strings = () => state.language === 'zh-CN' ? {
-    subtitle: '神经渲染管理器', homeHeadline: '游戏库',
-    homeDescription: '显示启动器中已安装的游戏，并直接标出哪些游戏支持 DLSS 5 神经渲染。',
-    library: '已安装游戏', viewAll: '查看全部',
+    subtitle: 'Pre-SR 管理器', homeHeadline: '主页',
+    homeDescription: '',
+    currentGame: '当前游戏', favorites: '收藏',
+    library: '游戏库', viewAll: '游戏库',
     libraryMeta: (all, compatible, configured) => `${all} 个游戏 · ${compatible} 个兼容 · ${configured} 个已配置`,
     emptyLibrary: '还没有检测到游戏，先扫描或手动添加。',
-    master: '启用神经渲染', masterBody: '关闭后只停用神经渲染，不删除 OptiScaler 或运行库文件。',
-    sectionTitle: 'DLSS 5 神经渲染', detected: '已检测到现有安装', detectedButton: '迁移并安装',
+    master: '启用 DLSS5', masterBody: '控制该游戏是否启用 DLSS5 神经渲染。',
+    sectionTitle: 'DLSS5 神经渲染', detected: '已检测到现有安装', detectedButton: '迁移并安装',
     info: 'Pre-SR 工作原理', rescan: '扫描游戏', saved: '设置已保存。', launch: '开始游戏', launching: '正在启动游戏…',
     compatible: '兼容', notCompatible: '不兼容', configured: '已配置', all: '全部', compatibleFilter: '兼容 DLSS 5', configuredFilter: '已配置',
     unsupportedTitle: '未检测到可用的 DLSS 5 路径',
     unsupportedBody: '这个已安装游戏会保留在游戏库里，但当前没有检测到原生 DLSS、64 位主程序和受支持渲染 API 的完整组合。',
-    overlayTitle: '游戏内 Overlay', overlayBody: '使用精简的 DLSS 5 游戏内面板，而不是完整的 OptiScaler 菜单。',
-    overlayEnabled: '启用精简 Overlay', hotkey: '打开快捷键', scale: '大小', opacity: '透明度', position: '位置',
+    overlayTitle: '游戏内面板', overlayBody: '',
+    overlayEnabled: '启用游戏内面板', hotkey: '打开快捷键', scale: '缩放', opacity: '透明度', position: '位置',
     positions: ['左上', '右上', '左下', '右下'],
-    overlayNote: '快捷键和显示参数会写入已安装游戏。更改快捷键后请重新启动游戏；旧 OptiScaler 安装可在游戏页选择迁移并安装。'
+    overlayNote: '快捷键和显示参数会写入已安装游戏。更改快捷键后请重新启动游戏。'
   } : {
-    subtitle: 'Neural Rendering Manager', homeHeadline: 'Game Library',
-    homeDescription: 'Installed launcher games, with DLSS 5 Neural Rendering compatibility shown at a glance.',
-    library: 'Installed games', viewAll: 'View all',
+    subtitle: 'Pre-SR Manager', homeHeadline: 'Home',
+    homeDescription: '',
+    currentGame: 'Current game', favorites: 'Favorites',
+    library: 'Library', viewAll: 'Library',
     libraryMeta: (all, compatible, configured) => `${all} games · ${compatible} compatible · ${configured} configured`,
     emptyLibrary: 'No installed games detected yet. Scan or add one manually.',
     master: 'Enable Neural Rendering', masterBody: 'Turn Neural Rendering off without removing OptiScaler or runtime files.',
@@ -235,35 +232,61 @@
     act(async () => { state = unwrap(await window.nrApp.selectGame(game.id)); showPage('game'); }, false);
   }
 
+  function homeCard(game) {
+    const card = document.createElement('button'); card.className = 'home-game-card'; card.type = 'button';
+    const art = document.createElement('img'); art.className = 'home-game-art'; art.alt = '';
+    const primary = game.coverDataUrl || game.bannerDataUrl || ''; const fallback = game.bannerDataUrl || game.iconDataUrl || '';
+    if (primary) art.src = primary;
+    art.addEventListener('error', () => { if (fallback && art.src !== fallback) art.src = fallback; else art.classList.add('hidden-art'); });
+    const shade = document.createElement('span'); shade.className = 'home-game-shade';
+    const text = document.createElement('span'); text.className = 'home-game-card-copy';
+    const title = document.createElement('b'); title.textContent = gameTitle(game);
+    const meta = document.createElement('small');
+    const copy = strings();
+    meta.textContent = [game.launcher, isConfigured(game) ? copy.configured : (isCompatible(game) ? copy.compatible : copy.notCompatible)].filter(Boolean).join(' · ');
+    text.append(title, meta); card.append(art, shade, text);
+    card.addEventListener('click', () => openGame(game));
+    return card;
+  }
+
   function renderHomeCards() {
-    const grid = document.getElementById('homeGameGrid'); if (!grid) return; grid.replaceChildren(); const copy = strings();
-    if (!state.games.length) { const empty = document.createElement('div'); empty.className = 'home-game-empty'; empty.textContent = copy.emptyLibrary; grid.appendChild(empty); return; }
-    for (const game of state.games) {
-      const card = document.createElement('button'); card.className = 'home-game-card'; card.type = 'button';
-      const art = document.createElement('img'); art.className = 'home-game-art'; art.alt = '';
-      const primary = game.coverDataUrl || game.bannerDataUrl || ''; const fallback = game.bannerDataUrl || game.iconDataUrl || '';
-      if (primary) art.src = primary;
-      art.addEventListener('error', () => { if (fallback && art.src !== fallback) art.src = fallback; else art.classList.add('hidden-art'); });
-      const shade = document.createElement('span'); shade.className = 'home-game-shade';
-      const text = document.createElement('span'); text.className = 'home-game-card-copy';
-      const title = document.createElement('b'); title.textContent = gameTitle(game);
-      const meta = document.createElement('small'); meta.textContent = [game.launcher, isCompatible(game) ? copy.compatible : copy.notCompatible, isConfigured(game) ? copy.configured : null].filter(Boolean).join(' · ');
-      text.append(title, meta); card.append(art, shade, text); card.classList.toggle('not-compatible', !isCompatible(game)); card.addEventListener('click', () => openGame(game)); grid.appendChild(card);
+    const currentGrid = document.getElementById('homeCurrentGrid');
+    const favoriteGrid = document.getElementById('homeFavoriteGrid');
+    if (!currentGrid || !favoriteGrid) return;
+    currentGrid.replaceChildren(); favoriteGrid.replaceChildren();
+    const copy = strings();
+    const current = selectedGame() || state.games.find(game => !game.hidden) || null;
+    if (current && !current.hidden) currentGrid.appendChild(homeCard(current));
+    else {
+      const empty = document.createElement('div'); empty.className = 'home-game-empty';
+      empty.textContent = state.language === 'zh-CN' ? '还没有当前游戏。' : 'No current game yet.';
+      currentGrid.appendChild(empty);
+    }
+    const favorites = state.games.filter(game => game.favorite && !game.hidden);
+    if (favorites.length) favorites.slice(0, 4).forEach(game => favoriteGrid.appendChild(homeCard(game)));
+    else {
+      const empty = document.createElement('div'); empty.className = 'home-game-empty';
+      empty.textContent = state.language === 'zh-CN' ? '还没有收藏的游戏。在游戏库里右键游戏卡即可添加收藏。' : 'No favorites yet. Right-click a library card to add one.';
+      favoriteGrid.appendChild(empty);
     }
   }
 
   function paintHomeCopy() {
-    const copy = strings(); const compatible = state.games.filter(isCompatible).length; const configured = state.games.filter(isConfigured).length;
-    const pairs = [['homeHeadline', copy.homeHeadline], ['homeDescription', copy.homeDescription], ['homeLibraryTitle', copy.library], ['homeLibraryMeta', copy.libraryMeta(state.games.length, compatible, configured)], ['homeScanBtn', copy.rescan], ['homeAddBtn', state.language === 'zh-CN' ? '添加游戏' : 'Add game']];
+    const copy = strings();
+    const pairs = [
+      ['homeHeadline', copy.homeHeadline],
+      ['homeCurrentTitle', copy.currentGame || (state.language === 'zh-CN' ? '当前游戏' : 'Current game')],
+      ['homeFavoriteTitle', copy.favorites || (state.language === 'zh-CN' ? '收藏' : 'Favorites')]
+    ];
     for (const [id, value] of pairs) { const node = document.getElementById(id); if (node) node.textContent = value; }
-    const viewAll = document.getElementById('homeOpenGamesBtn'); if (viewAll) viewAll.innerHTML = `${copy.viewAll} <span>→</span>`;
+    const viewAll = document.getElementById('homeOpenGamesBtn');
+    if (viewAll) viewAll.innerHTML = `${copy.viewAll} <span>→</span>`;
   }
 
   // Replaces the old dashboard renderer: the new Home intentionally has no legacy counter nodes.
   renderHome = function() {
-    const scan = document.getElementById('homeScanBtn'); const add = document.getElementById('homeAddBtn'); const open = document.getElementById('homeOpenGamesBtn'); const status = document.getElementById('homeScanStatus');
-    if (scan) scan.disabled = busy; if (add) add.disabled = busy; if (open) open.disabled = busy || !state.games.length;
-    if (status) status.textContent = busy && currentPage === 'home' ? t('scanningGames') : scanMessage;
+    const open = document.getElementById('homeOpenGamesBtn');
+    if (open) open.disabled = busy || !state.games.length;
     paintHomeCopy(); renderHomeCards();
   };
 
@@ -300,7 +323,7 @@
     if (document.getElementById('overlaySettingsCard')) return;
     const settingsCard = document.querySelector('#page-settings .settings-page-card'); const about = settingsCard?.querySelector('.about-copy'); if (!settingsCard) return;
     const card = document.createElement('section'); card.id = 'overlaySettingsCard'; card.className = 'overlay-settings-card';
-    card.innerHTML = `<div class="overlay-settings-head"><div><strong id="overlayTitle"></strong><p id="overlayBody"></p></div><label class="switch"><input id="overlayEnabled" type="checkbox"><span></span></label></div><div class="overlay-settings-grid"><label class="field"><span id="overlayHotkeyLabel"></span><select id="overlayHotkey"><option value="45">Insert</option><option value="119">F8</option><option value="120">F9</option><option value="121">F10</option><option value="36">Home</option></select></label><label class="field"><span id="overlayScaleLabel"></span><select id="overlayScale"><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option></select></label><label class="field overlay-opacity-field"><span><span id="overlayOpacityLabel"></span><b id="overlayOpacityValue">82%</b></span><input id="overlayOpacity" type="range" min="0.5" max="0.95" step="0.05"></label><label class="field"><span id="overlayPositionLabel"></span><select id="overlayPosition"></select></label></div><p class="overlay-settings-note" id="overlayNote"></p>`;
+    card.innerHTML = `<div class="overlay-settings-head"><div><strong id="overlayTitle"></strong><p id="overlayBody"></p></div></div><div class="overlay-settings-grid"><div class="overlay-enabled-row"><span id="overlayEnabledLabel"></span><label class="switch"><input id="overlayEnabled" type="checkbox"><span></span></label></div><label class="field"><span id="overlayHotkeyLabel"></span><select id="overlayHotkey"><option value="45">Insert</option><option value="119">F8</option><option value="120">F9</option><option value="121">F10</option><option value="36">Home</option></select></label><label class="field"><span id="overlayScaleLabel"></span><select id="overlayScale"><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option></select></label><label class="field overlay-opacity-field"><span><span id="overlayOpacityLabel"></span><b id="overlayOpacityValue">82%</b></span><input id="overlayOpacity" type="range" min="0.5" max="0.95" step="0.05"></label><label class="field"><span id="overlayPositionLabel"></span><select id="overlayPosition"></select></label></div><p class="overlay-settings-note" id="overlayNote"></p>`;
     if (about) settingsCard.insertBefore(card, about); else settingsCard.appendChild(card);
     const save = async patch => { overlayPrefs = { ...overlayPrefs, ...patch }; const response = await window.nrApp.setOverlayPreferences(overlayPrefs); if (!response?.ok) throw new Error(response?.message || 'Unable to save overlay preferences'); overlayPrefs = { ...overlayPrefs, ...response.value }; paintOverlaySettings(); toast(strings().saved); };
     document.getElementById('overlayEnabled').addEventListener('change', event => act(() => save({ enabled: event.target.checked }), false));
@@ -313,7 +336,7 @@
 
   function paintOverlaySettings() {
     const card = document.getElementById('overlaySettingsCard'); if (!card) return; const copy = strings();
-    for (const [id, value] of [['overlayTitle', copy.overlayTitle], ['overlayBody', copy.overlayBody], ['overlayHotkeyLabel', copy.hotkey], ['overlayScaleLabel', copy.scale], ['overlayOpacityLabel', copy.opacity], ['overlayPositionLabel', copy.position], ['overlayNote', copy.overlayNote]]) { const node = document.getElementById(id); if (node) node.textContent = value; }
+    for (const [id, value] of [['overlayTitle', copy.overlayTitle], ['overlayBody', copy.overlayBody], ['overlayEnabledLabel', copy.overlayEnabled], ['overlayHotkeyLabel', copy.hotkey], ['overlayScaleLabel', copy.scale], ['overlayOpacityLabel', copy.opacity], ['overlayPositionLabel', copy.position], ['overlayNote', copy.overlayNote]]) { const node = document.getElementById(id); if (node) node.textContent = value; }
     document.getElementById('overlayEnabled').checked = overlayPrefs.enabled !== false;
     document.getElementById('overlayHotkey').value = String(overlayPrefs.hotkey || 45); document.getElementById('overlayScale').value = String(overlayPrefs.scale || 1);
     document.getElementById('overlayOpacity').value = String(overlayPrefs.opacity ?? 0.82); document.getElementById('overlayOpacityValue').textContent = `${Math.round((overlayPrefs.opacity ?? 0.82) * 100)}%`;
@@ -328,7 +351,13 @@
     const heading = document.querySelector('#gameDetail .section-heading h2'); if (heading) heading.textContent = copy.sectionTitle;
     const row = ensureMasterRow();
     if (row) { document.getElementById('nrMasterTitle').textContent = copy.master; document.getElementById('nrMasterBody').textContent = copy.masterBody; const enabled = document.getElementById('nrEnabledToggle'); enabled.checked = game.settings?.enabled !== false; enabled.disabled = busy || !compatible; }
-    const info = document.getElementById('nrInfoButton'); if (info) info.title = copy.info; const pre = document.getElementById('presrToggle'); if (pre) pre.disabled = busy || !compatible;
+    const info = document.getElementById('nrInfoButton'); if (info) info.title = copy.info;
+    const pre = document.getElementById('presrToggle');
+    if (pre) {
+      const masterEnabled = game.settings?.enabled !== false;
+      pre.disabled = busy || !compatible || !masterEnabled;
+      pre.closest('.setting-row')?.classList.toggle('setting-disabled', !masterEnabled);
+    }
     const notice = ensureCompatibilityNotice(); if (notice) { notice.classList.toggle('hidden', compatible); document.getElementById('compatibilityNoticeTitle').textContent = copy.unsupportedTitle; document.getElementById('compatibilityNoticeBody').textContent = copy.unsupportedBody; }
     const launch = ensureLaunchButton(); if (launch) launch.textContent = copy.launch;
     if (game.existingSetup && !game.installed) { const chip = document.getElementById('installState'); const install = document.getElementById('installBtn'); if (chip) chip.textContent = copy.detected; if (install) { install.textContent = copy.detectedButton; install.disabled = busy || !compatible; } }
@@ -339,6 +368,13 @@
   renderGames = function() {
     originalRenderGames(); ensureScanButton(); const scan = document.getElementById('rescanGamesBtn'); if (scan) { scan.textContent = strings().rescan; scan.disabled = busy; } decorateGameRows(); paintGamesFilters();
   };
+
+  document.getElementById('supportGithubBtn')?.addEventListener('click', async () => {
+    try {
+      const response = await window.nrApp.openGithub();
+      if (!response?.ok) throw new Error(response?.message || 'Unable to open GitHub');
+    } catch (error) { toast(error.message || String(error)); }
+  });
 
   const originalRender = render;
   render = function() { originalRender(); paintBrand(); ensureOverlaySettings(); paintOverlaySettings(); };

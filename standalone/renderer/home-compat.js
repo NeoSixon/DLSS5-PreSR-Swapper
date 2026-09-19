@@ -16,9 +16,6 @@
     I18N['zh-CN'].gamesBody = '显示启动器中检测到的已安装游戏；可筛选支持 DLSS 5 或已经配置的游戏。';
   }
 
-  document.querySelector('.nav-item[data-page="home"]')?.remove();
-  document.getElementById('page-home')?.remove();
-
   const gamesPage = document.getElementById('page-games');
   gamesPage?.classList.add('library-page');
 
@@ -26,9 +23,8 @@
   // individual buttons. This covers library cards, Add game, Back, and sidebar nav.
   const previousShowPage = showPage;
   showPage = function(page) {
-    const target = page === 'home' ? 'games' : page;
     if (scroller) scroller.scrollTop = 0;
-    previousShowPage(target);
+    previousShowPage(page);
     if (scroller) {
       scroller.scrollTop = 0;
       requestAnimationFrame(() => { scroller.scrollTop = 0; });
@@ -41,6 +37,8 @@
     game?.installed && game?.hasBackup && game?.optiscaler?.version && game.optiscaler.version !== MANAGER_BACKEND_ID
   );
   let libraryFilter = 'all';
+  let libraryQuery = '';
+  let librarySort = 'default';
   let openingGame = false;
   let menuPending = false;
 
@@ -49,10 +47,11 @@
     scanning: '正在扫描…',
     add: '添加游戏',
     all: '全部',
-    compatible: '兼容 DLSS 5',
-    configured: '已配置',
+    compatible: 'Pre-SR 就绪',
+    configured: 'DLSS5 已配置',
+    update: '可更新',
     hidden: '已隐藏',
-    favorites: '收藏夹',
+    favorites: '收藏',
     otherGames: '其他游戏',
     opening: '正在读取游戏状态…',
     launching: '已发送游戏启动请求。',
@@ -63,9 +62,12 @@
     incompatibleTag: '不兼容',
     configuredTag: '已配置',
     empty: '没有符合当前筛选条件的游戏。',
+    search: '搜索游戏…',
+    sortDefault: '默认排序',
+    sortName: '按名称',
     updateBackend: '更新游戏内后端',
     updatingBackend: '正在更新…',
-    backendUpdated: '游戏内后端已更新。原文件备份已保留，请重新启动游戏后再测试 Overlay。',
+    backendUpdated: '游戏内后端已更新。原文件备份已保留，请重新启动游戏后再测试游戏内面板。',
     languageError: '语言切换失败。',
     overlayLanguageError: '桌面语言已切换，但游戏内 Overlay 语言同步失败。',
     summary: (all, compatible, configured) => `${all} 个已安装游戏 · ${compatible} 个兼容 · ${configured} 个已配置`
@@ -74,8 +76,9 @@
     scanning: 'Scanning…',
     add: 'Add game',
     all: 'All',
-    compatible: 'DLSS 5 compatible',
-    configured: 'Configured',
+    compatible: 'Pre-SR ready',
+    configured: 'DLSS5 configured',
+    update: 'Update available',
     hidden: 'Hidden',
     favorites: 'Favorites',
     otherGames: 'Other games',
@@ -88,6 +91,9 @@
     incompatibleTag: 'Not compatible',
     configuredTag: 'Configured',
     empty: 'No games match this filter.',
+    search: 'Search games…',
+    sortDefault: 'Default order',
+    sortName: 'Name',
     updateBackend: 'Update in-game backend',
     updatingBackend: 'Updating…',
     backendUpdated: 'In-game backend updated. The original-file backup was preserved. Restart the game before testing the overlay.',
@@ -111,12 +117,29 @@
       scan.addEventListener('click', () => scanGames());
     }
 
+    let searchRow = document.getElementById('librarySearchRow');
+    if (!searchRow) {
+      searchRow = document.createElement('div');
+      searchRow.id = 'librarySearchRow';
+      searchRow.className = 'library-search-row';
+      const search = document.createElement('input');
+      search.id = 'librarySearchInput';
+      search.type = 'search';
+      search.autocomplete = 'off';
+      search.addEventListener('input', () => { libraryQuery = search.value.trim().toLowerCase(); renderGames(); });
+      const sort = document.createElement('select');
+      sort.id = 'librarySortSelect';
+      sort.addEventListener('change', () => { librarySort = sort.value; renderGames(); });
+      searchRow.append(search, sort);
+      heading.after(searchRow);
+    }
+
     let bar = document.getElementById('gamesFilterBar');
     if (bar) bar.remove();
     bar = document.createElement('div');
     bar.id = 'gamesFilterBar';
     bar.className = 'games-filter-bar';
-    for (const filter of ['all', 'compatible', 'configured', 'hidden']) {
+    for (const filter of ['all', 'configured', 'compatible', 'update', 'favorite', 'hidden']) {
       const button = document.createElement('button');
       button.type = 'button';
       button.dataset.filter = filter;
@@ -248,11 +271,19 @@
 
     const c = copy();
     const library = state.games.filter(game => !game.hidden);
-    const visible = state.games.filter(game => libraryFilter === 'hidden' ? game.hidden : !game.hidden && (
-      libraryFilter === 'all' ||
-      (libraryFilter === 'compatible' && isCompatible(game)) ||
-      (libraryFilter === 'configured' && isConfigured(game))
-    ));
+    let visible = state.games.filter(game => {
+      const filterMatch = libraryFilter === 'hidden' ? game.hidden : !game.hidden && (
+        libraryFilter === 'all' ||
+        (libraryFilter === 'compatible' && isCompatible(game)) ||
+        (libraryFilter === 'configured' && isConfigured(game)) ||
+        (libraryFilter === 'update' && needsBackendUpdate(game)) ||
+        (libraryFilter === 'favorite' && game.favorite)
+      );
+      const queryMatch = !libraryQuery || [gameTitle(game), game.launcher, game.chosen?.apiLabel]
+        .filter(Boolean).join(' ').toLowerCase().includes(libraryQuery);
+      return filterMatch && queryMatch;
+    });
+    if (librarySort === 'name') visible = [...visible].sort((a, b) => gameTitle(a).localeCompare(gameTitle(b), state.language));
 
     if (!visible.length) {
       const empty = document.createElement('div');
@@ -290,7 +321,27 @@
     }
     if (add) { add.textContent = c.add; add.disabled = busy; }
 
-    const labels = { all: c.all, compatible: c.compatible, configured: c.configured, hidden: `${c.hidden} (${state.games.length - library.length})` };
+    const labels = {
+      all: c.all,
+      compatible: c.compatible,
+      configured: c.configured,
+      update: c.update,
+      favorite: c.favorites,
+      hidden: `${c.hidden} (${state.games.length - library.length})`
+    };
+    const search = document.getElementById('librarySearchInput');
+    if (search) search.placeholder = c.search;
+    const sort = document.getElementById('librarySortSelect');
+    if (sort) {
+      if (!sort.options.length) {
+        const a = document.createElement('option'); a.value = 'default';
+        const b = document.createElement('option'); b.value = 'name';
+        sort.append(a, b);
+      }
+      sort.options[0].textContent = c.sortDefault;
+      sort.options[1].textContent = c.sortName;
+      sort.value = librarySort;
+    }
     for (const button of document.querySelectorAll('#gamesFilterBar button')) {
       button.textContent = labels[button.dataset.filter] || button.dataset.filter;
       button.classList.toggle('active', button.dataset.filter === libraryFilter);
@@ -405,7 +456,7 @@
     paintBackendUpdate();
   };
 
-  currentPage = currentPage === 'settings' ? 'settings' : 'games';
+  currentPage = ['home', 'games', 'settings', 'game'].includes(currentPage) ? currentPage : 'home';
   if (scroller) scroller.scrollTop = 0;
   render();
 })();

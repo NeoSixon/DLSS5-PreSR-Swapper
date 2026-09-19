@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>DLSS 5 Neural Rendering Manager</title>
+  <title>DLSS5 Pre-SR Manager</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="pass-styles.css" />
   <link rel="stylesheet" href="liquid-glass.css" />
@@ -12,7 +12,7 @@
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand" aria-label="DLSS5">
-        <span class="brand-title"><span class="brand-dlss">DLSS</span><strong class="brand-five">5</strong></span>
+        <span class="brand-title"><span class="brand-dlss">DLSS</span><strong class="brand-five">5</strong></span><small class="brand-subtitle">Pre-SR Manager</small>
       </div>
 
       <nav class="nav">
@@ -195,9 +195,14 @@
               <h2 data-i18n="supportTitle">Support development</h2>
               <p data-i18n="supportBody">If this tool is useful to you, you can support continued development on Buy Me a Coffee.</p>
               <p class="support-hint" data-i18n="supportHint">Scan the QR code or open the page directly.</p>
-              <button class="ghost support-open" id="supportOpenBtn" type="button">
-                <span>buymeacoffee.com/NeoSixon</span><b aria-hidden="true">↗</b>
-              </button>
+              <div class="support-link-row">
+                <button class="ghost support-open" id="supportOpenBtn" type="button">
+                  <span>Buy Me a Coffee</span><b aria-hidden="true">↗</b>
+                </button>
+                <button class="ghost support-open support-github" id="supportGithubBtn" type="button">
+                  <span>GitHub</span><b aria-hidden="true">↗</b>
+                </button>
+              </div>
             </div>
             <button class="support-qr-button" id="supportQrBtn" type="button" aria-label="Open Buy Me a Coffee">
               <img src="assets/buymeacoffee-qr.png" alt="Buy Me a Coffee QR code" />

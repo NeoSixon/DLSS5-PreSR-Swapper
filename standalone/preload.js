@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('nrApp', Object.freeze({
   getOverlayPreferences: () => ipcRenderer.invoke('app:get-overlay-preferences'),
   setOverlayPreferences: preferences => ipcRenderer.invoke('app:set-overlay-preferences', preferences),
   openSupport: () => ipcRenderer.invoke('app:open-support'),
+  openGithub: () => ipcRenderer.invoke('app:open-github'),
   rescanGames: () => ipcRenderer.invoke('games:rescan'),
   addGame: () => ipcRenderer.invoke('games:add'),
   chooseGameFolder: () => ipcRenderer.invoke('games:choose-folder'),
