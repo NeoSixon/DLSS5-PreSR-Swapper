@@ -307,17 +307,20 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         wordmarkLine(ImVec2(rx1, mid), ImVec2(rx0, mid));
         wordmarkLine(ImVec2(rx0 + 8.0f * scale, mid), ImVec2(rx1 + 3.0f * scale, bottom));
 
-        const float separatorX = brandAt.x + nrWidth + 10.0f * scale;
-        draw->AddLine(ImVec2(separatorX, brandAt.y + 5.0f * scale),
-                      ImVec2(separatorX, brandAt.y + headerHeight - 5.0f * scale),
-                      ImGui::GetColorU32(ImVec4(0.55f, 0.62f, 0.64f, 0.38f)), 1.0f * scale);
+        const float titleX = brandAt.x + nrWidth + 12.0f * scale;
+        const ImVec2 dlssSize = ImGui::CalcTextSize("DLSS");
+        const ImVec2 fiveSize = ImGui::CalcTextSize("5");
+        const float titleY = brandAt.y + (headerHeight - dlssSize.y) * 0.5f;
+        const ImU32 titleColor = ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f));
 
-        const ImVec2 titleSize = ImGui::CalcTextSize("DLSS 5");
-        draw->AddText(ImVec2(separatorX + 11.0f * scale,
-                             brandAt.y + (headerHeight - titleSize.y) * 0.5f),
-                      ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f)), "DLSS 5");
+        // DLSS stays visually light; the attached 5 gets a slightly heavier treatment.
+        draw->AddText(ImVec2(titleX, titleY), titleColor, "DLSS");
+        const float fiveX = titleX + dlssSize.x;
+        draw->AddText(ImVec2(fiveX - 0.45f * scale, titleY), titleColor, "5");
+        draw->AddText(ImVec2(fiveX + 0.45f * scale, titleY), titleColor, "5");
+        draw->AddText(ImVec2(fiveX, titleY), titleColor, "5");
 
-        ImGui::Dummy(ImVec2(nrWidth + 90.0f * scale, headerHeight));
+        ImGui::Dummy(ImVec2(nrWidth + dlssSize.x + fiveSize.x + 28.0f * scale, headerHeight));
 
         const float closeWidth = 32.0f * scale;
         ImGui::SameLine();
