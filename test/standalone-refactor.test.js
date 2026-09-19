@@ -121,37 +121,40 @@ test('standalone packaging has its own DLSS 5 product identity and entry point',
   assert.doesNotMatch(config.files.join('\n'), /src\/\*\*/);
 });
 
-test('standalone shell uses DLSS5 as the primary product identity', () => {
+test('standalone shell uses the DLSS5 + Pre-SR Manager wordmark', () => {
   const html = read('standalone/renderer/index.html');
-  const css = read('standalone/renderer/style.css');
+  const theme = read('standalone/renderer/nvidia-ui.css');
   const ux = read('standalone/renderer/ux-fixes.js');
   assert.match(html, /class="brand-dlss">DLSS/);
   assert.match(html, /class="brand-five">5/);
+  assert.match(html, /class="brand-subtitle">Pre-SR Manager/);
+  assert.match(html, /aria-label="DLSS5 Pre-SR Manager"/);
+  assert.match(theme, /\.brand-dlss:after/);
+  assert.match(theme, /background:var\(--accent\)/);
+  assert.match(theme, /\.brand-five\{[^}]*color:var\(--accent\)/);
+  assert.match(ux, /subtitle\.textContent = 'Pre-SR Manager'/);
   assert.doesNotMatch(html, /class="brand-mark"/);
   assert.doesNotMatch(html, />NR</);
-  assert.match(css, /\.brand-dlss\{font-weight:350\}/);
-  assert.match(css, /\.brand-five\{font-weight:850;color:#a0f57b\}/);
-  assert.match(ux, /querySelector\('\.brand-dlss'\)/);
-  assert.match(ux, /querySelector\('\.brand-five'\)/);
-  assert.doesNotMatch(ux, /querySelector\('\.brand strong'\)/);
 });
 
-test('standalone build generates the approved flat 5 Manager application icon', () => {
+test('standalone build generates the approved vector 5 Manager application icon', () => {
   const pkg = JSON.parse(read('package.json'));
   const main = read('standalone/main.js');
   const iconScript = read('scripts/make-standalone-icon.js');
-  const iconSource = path.join(root, 'standalone', 'renderer', 'icon-source.png');
+  const iconSource = read('standalone/renderer/icon-source.svg');
   assert.equal(pkg.scripts['icon:standalone'], 'electron scripts/make-standalone-icon.js');
   assert.equal(pkg.scripts['prebuild:standalone:portable'], 'npm run icon:standalone');
   assert.equal(pkg.scripts['prestart:standalone'], 'npm run icon:standalone');
   assert.match(main, /renderer['"], 'app-icon\.png/);
   assert.match(iconScript, /DLSS 5 Pre-SR Manager standalone icon/);
-  assert.match(iconScript, /icon-source\.png/);
-  assert.match(iconScript, /nativeImage\.createFromPath\(SOURCE_ICON\)/);
+  assert.match(iconScript, /icon-source\.svg/);
+  assert.match(iconScript, /transparent: true/);
+  assert.match(iconScript, /backgroundColor: '#00000000'/);
   assert.match(iconScript, /build\/icon\.ico|icon\.ico/);
   assert.match(iconScript, /app-icon\.png/);
-  assert.ok(fs.existsSync(iconSource), 'approved icon source is committed');
-  assert.ok(fs.statSync(iconSource).size > 1000, 'approved icon source is a non-empty PNG');
+  assert.match(iconSource, /rx="210"/);
+  assert.match(iconSource, /fill="#80C704"/);
+  assert.match(iconSource, />MANAGER<\/text>/);
 });
 
 test('settings includes a Buy Me a Coffee support card with a bundled QR code', () => {

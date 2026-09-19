@@ -1,14 +1,15 @@
 'use strict';
 // DLSS 5 Pre-SR Manager standalone icon.
-// Source artwork is the approved flat "5 / MANAGER" mark.
+// Render the approved flat 5 / MANAGER mark from vector artwork so every ICO
+// size is generated from a clean 1024px source with true transparent corners.
 
-const { app, nativeImage } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'build');
-const SOURCE_ICON = path.join(ROOT, 'standalone', 'renderer', 'icon-source.png');
+const SOURCE_ICON = path.join(ROOT, 'standalone', 'renderer', 'icon-source.svg');
 const WINDOW_ICON = path.join(ROOT, 'standalone', 'renderer', 'app-icon.png');
 const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 
@@ -35,9 +36,28 @@ function buildIco(images) {
   return Buffer.concat([header, directory, ...images.map(image => image.png)]);
 }
 
-app.whenReady().then(() => {
-  const source = nativeImage.createFromPath(SOURCE_ICON);
-  if (source.isEmpty()) throw new Error(`Unable to load standalone icon source: ${SOURCE_ICON}`);
+app.whenReady().then(async () => {
+  const sourceSvg = fs.readFileSync(SOURCE_ICON, 'utf8');
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+    html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:transparent}
+    svg{display:block;width:1024px;height:1024px}
+  </style></head><body>${sourceSvg}</body></html>`;
+
+  const win = new BrowserWindow({
+    show: false,
+    frame: false,
+    transparent: true,
+    backgroundColor: '#00000000',
+    width: 1024,
+    height: 1024,
+    resizable: false,
+    webPreferences: { offscreen: true }
+  });
+
+  await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+  await new Promise(resolve => setTimeout(resolve, 80));
+  const source = await win.webContents.capturePage({ x: 0, y: 0, width: 1024, height: 1024 });
+  win.destroy();
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.mkdirSync(path.dirname(WINDOW_ICON), { recursive: true });
@@ -51,7 +71,7 @@ app.whenReady().then(() => {
   fs.writeFileSync(path.join(OUT_DIR, 'icon.png'), source.toPNG());
   fs.writeFileSync(WINDOW_ICON, source.resize({ width: 256, height: 256, quality: 'best' }).toPNG());
 
-  console.log('wrote approved 5/MANAGER standalone icon to build/icon.ico, build/icon.png and standalone/renderer/app-icon.png');
+  console.log('wrote vector 5/MANAGER standalone icon with transparent rounded corners');
   app.quit();
 }).catch(error => {
   console.error(error);

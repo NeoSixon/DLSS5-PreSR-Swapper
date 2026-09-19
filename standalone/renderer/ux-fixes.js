@@ -98,8 +98,8 @@
   const isConfigured = game => Boolean(game?.installed || game?.existingSetup);
 
   function paintBrand() {
-    const subtitle = document.querySelector('.brand small');
-    if (subtitle) subtitle.textContent = strings().subtitle;
+    const subtitle = document.querySelector('.brand-subtitle');
+    if (subtitle) subtitle.textContent = 'Pre-SR Manager';
   }
 
   // Keep the language control as the native dropdown from index.html.
