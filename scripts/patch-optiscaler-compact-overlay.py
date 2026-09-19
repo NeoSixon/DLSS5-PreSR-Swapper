@@ -249,6 +249,13 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.16f, 0.23f, 0.23f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.22f, 0.34f, 0.28f, 1.0f));
 
+    // Scale text with the panel. The manager already scales layout metrics with
+    // menuResScale, so leaving the font at its base size makes 125/150% look
+    // like enlarged controls around tiny text.
+    const bool useHqFont = config->UseHQFont.value_or_default();
+    if (useHqFont)
+        ImGui::PushFontSize(std::round(fontSize * scale));
+
     bool changed = false;
 
     auto closeOverlay = [&]()
@@ -263,6 +270,9 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
 
     if (ImGui::Begin("DLSS 5 Neural Rendering##DoubleSixunManagerOverlay", nullptr, flags))
     {
+        if (!useHqFont)
+            ImGui::SetWindowFontScale(scale);
+
         const float logo = 34.0f * scale;
         const ImVec2 logoAt = ImGui::GetCursorScreenPos();
         ImDrawList* draw = ImGui::GetWindowDrawList();
@@ -628,6 +638,9 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
             closeOverlay();
     }
     ImGui::End();
+
+    if (useHqFont)
+        ImGui::PopFontSize();
 
     ImGui::PopStyleColor(13);
     ImGui::PopStyleVar(6);

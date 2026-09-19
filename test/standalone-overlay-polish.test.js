@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr11 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr12 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr11/, `${rel} should use mgr11`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr12/, `${rel} should use mgr12`);
   }
 });
 
@@ -93,4 +93,11 @@ test('technical overlay controls expose bilingual hover explanations', () => {
   assert.match(fix, /每两帧运行一次 NR/);
   assert.match(fix, /估算相机数据辅助帧生成/);
   assert.match(fix, /HDR 亮度进入 NR 时的映射方式/);
+});
+
+test('manager overlay scales font size with UI scale', () => {
+  const patch = read('scripts/patch-optiscaler-compact-overlay.py');
+  assert.match(patch, /ImGui::PushFontSize\(std::round\(fontSize \* scale\)\)/);
+  assert.match(patch, /ImGui::SetWindowFontScale\(scale\)/);
+  assert.match(patch, /ImGui::PopFontSize\(\)/);
 });
