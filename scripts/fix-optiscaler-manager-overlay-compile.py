@@ -246,7 +246,7 @@ def main() -> int:
         ('ImGui::SliderFloat("Detail strength", &detail, 0.0f, 2.0f, "%.2f")', 'ImGui::SliderFloat(tr("Detail strength", "细节强度"), &detail, 0.0f, 2.0f, "%.2f")', 'detail strength'),
         ('ImGui::SliderFloat("Colour strength", &colour, 0.0f, 4.0f, "%.2f")', 'ImGui::SliderFloat(tr("Colour strength", "色彩强度"), &colour, 0.0f, 4.0f, "%.2f")', 'colour strength'),
         ('ImGui::CollapsingHeader("Advanced")', 'ImGui::CollapsingHeader(tr("Advanced", "高级"))', 'advanced header'),
-        ('ImGui::Checkbox("Apply to finished picture", &finishedPicture)', 'ImGui::Checkbox(tr("Apply to finished picture", "应用于最终画面"), &finishedPicture)', 'finished picture'),
+        ('ImGui::Checkbox("Apply to finished picture", &finishedPicture)', 'ImGui::Checkbox(tr("Apply NR to finished picture", "在最终画面应用 NR"), &finishedPicture)', 'finished picture'),
         ('ImGui::TextDisabled("Finished-picture mode requires native DirectX 12.");', 'ImGui::TextDisabled("%s", tr("Finished-picture mode requires native DirectX 12.", "最终画面模式需要原生 DirectX 12。"));', 'finished picture hint'),
         ('ImGui::Checkbox("Apply effect (A/B preview)", &applyModel)', 'ImGui::Checkbox(tr("Apply effect (A/B preview)", "应用效果（A/B 对比）"), &applyModel)', 'A/B checkbox'),
         ('ImGui::SetTooltip("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.");', 'ImGui::SetTooltip("%s", tr("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.", "关闭可对比前后效果；神经渲染仍会运行并保持 GPU 开销。"));', 'A/B tooltip'),
@@ -268,14 +268,14 @@ def main() -> int:
     # actual ImGui items so the explanation also works when an option is disabled.
     text = replace_once(
         text,
-        '''            if (ImGui::Checkbox(tr("Apply to finished picture", "应用于最终画面"), &finishedPicture))
+        '''            if (ImGui::Checkbox(tr("Apply NR to finished picture", "在最终画面应用 NR"), &finishedPicture))
             {
                 config->DlssNrFinishedPicture = finishedPicture;
                 DlssNr::RetryAfterFailure();
                 changed = true;
             }
             ImGui::EndDisabled();''',
-        '''            if (ImGui::Checkbox(tr("Apply to finished picture", "应用于最终画面"), &finishedPicture))
+        '''            if (ImGui::Checkbox(tr("Apply NR to finished picture", "在最终画面应用 NR"), &finishedPicture))
             {
                 config->DlssNrFinishedPicture = finishedPicture;
                 DlssNr::RetryAfterFailure();
@@ -283,12 +283,12 @@ def main() -> int:
             }
             if (beforeSr)
                 hoverHelp(
-                    "With Pre-SR enabled, NR runs at input resolution but does not modify the game image there. Its saved changes are upscaled separately with DLSS and applied only to the finished picture. Experimental; requires native DX12 + DLSS SR and does not support Ray Reconstruction.",
-                    "当前已开启 Pre-SR：NR 会在输入分辨率计算，但不会直接改动超分前的游戏画面；它只保存 NR 产生的变化，随后单独用 DLSS 放大，并在最终画面阶段再叠加。属于实验功能；仅支持原生 DX12 + DLSS SR，不支持光线重建。");
+                    "Apply the NR effect after the game finishes upscaling, lighting and post-processing. This can reduce green noise or post-processing conflicts in some games. Pre-SR still controls where NR is calculated; with Pre-SR on, the effect is simply applied later. Native DX12 + DLSS SR only; Ray Reconstruction is not supported.",
+                    "开启后，NR 效果会在游戏完成超分、光照和后处理后再应用，可减少部分游戏中的绿色噪点或后处理冲突。当前已开启 Pre-SR：NR 仍会在超分前计算，但效果会延后到最终画面再应用。仅支持原生 DX12 + DLSS SR，不支持光线重建。");
             else
                 hoverHelp(
-                    "With Pre-SR disabled, NR runs directly on the finished picture after the game's lighting and effects. This can reduce green-noise artifacts in some games. Native DX12 only.",
-                    "当前未开启 Pre-SR：NR 会直接作用于游戏完成光照、特效和超分后的最终画面。某些游戏中这可以减少绿色噪点等伪影。仅支持原生 DX12。");
+                    "Apply the NR effect after the game finishes upscaling, lighting and post-processing. This can reduce green noise or post-processing conflicts in some games. With Pre-SR off, NR works directly on the finished picture. Native DX12 only.",
+                    "开启后，NR 效果会在游戏完成超分、光照和后处理后再应用，可减少部分游戏中的绿色噪点或后处理冲突。当前未开启 Pre-SR：NR 会直接处理最终画面。仅支持原生 DX12。");
             ImGui::EndDisabled();''',
         "finished-picture hover help")
 
