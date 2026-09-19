@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr15 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr16 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr15/, `${rel} should use mgr15`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr16/, `${rel} should use mgr16`);
   }
 });
 
@@ -107,7 +107,10 @@ test('manager header uses a sharp line-built NR wordmark without the old square 
   assert.match(patch, /const float nrStroke/);
   assert.match(patch, /wordmarkLine/);
   assert.match(patch, /nrGreen/);
-  assert.match(patch, /"DLSS 5"/);
+  assert.match(patch, /"DLSS"/);
+  assert.match(patch, /const float fiveX/);
+  assert.doesNotMatch(patch, /"DLSS 5"/);
+  assert.doesNotMatch(patch, /separatorX/);
   assert.doesNotMatch(patch, /AddText\(ImGui::GetFont\(\), brandFontSize/);
   assert.doesNotMatch(patch, /AddRectFilled\(logoAt/);
   assert.doesNotMatch(patch, /TextDisabled\("Neural Rendering"\)/);
