@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr10 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr11 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr10/, `${rel} should use mgr10`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr11/, `${rel} should use mgr11`);
   }
 });
 
@@ -87,7 +87,7 @@ test('technical overlay controls expose bilingual hover explanations', () => {
   const fix = read('scripts/fix-optiscaler-manager-overlay-compile.py');
   assert.match(fix, /hoverHelp/);
   assert.match(fix, /ImGuiHoveredFlags_AllowWhenDisabled/);
-  assert.match(fix, /应用于最终画面/);
+  assert.match(fix, /在最终画面应用 NR/);
   assert.match(fix, /仅支持原生 DX12 \+ DLSS SR，不支持光线重建/);
   assert.match(fix, /细节累积速率/);
   assert.match(fix, /每两帧运行一次 NR/);

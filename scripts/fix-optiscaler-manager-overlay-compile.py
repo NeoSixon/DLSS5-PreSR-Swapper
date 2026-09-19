@@ -283,12 +283,12 @@ def main() -> int:
             }
             if (beforeSr)
                 hoverHelp(
-                    "Apply the NR effect after the game finishes upscaling, lighting and post-processing. This can reduce green noise or post-processing conflicts in some games. Pre-SR still controls where NR is calculated; with Pre-SR on, the effect is simply applied later. Native DX12 + DLSS SR only; Ray Reconstruction is not supported.",
-                    "开启后，NR 效果会在游戏完成超分、光照和后处理后再应用，可减少部分游戏中的绿色噪点或后处理冲突。当前已开启 Pre-SR：NR 仍会在超分前计算，但效果会延后到最终画面再应用。仅支持原生 DX12 + DLSS SR，不支持光线重建。");
+                    "Current: Pre-SR is on.\nRecommended: keep this off; try it only for green noise, colour issues, or post-processing conflicts.\nLimits: native DX12 + DLSS SR only; Ray Reconstruction is not supported.",
+                    "当前配置：Pre-SR 已开启\n推荐：保持关闭；出现绿色噪点、颜色异常或后处理问题时再尝试开启。\n限制：仅支持原生 DX12 + DLSS SR，不支持光线重建。");
             else
                 hoverHelp(
-                    "Apply the NR effect after the game finishes upscaling, lighting and post-processing. This can reduce green noise or post-processing conflicts in some games. With Pre-SR off, NR works directly on the finished picture. Native DX12 only.",
-                    "开启后，NR 效果会在游戏完成超分、光照和后处理后再应用，可减少部分游戏中的绿色噪点或后处理冲突。当前未开启 Pre-SR：NR 会直接处理最终画面。仅支持原生 DX12。");
+                    "Current: Pre-SR is off.\nRecommended: enable Pre-SR first; running NR directly on the finished picture is better suited to compatibility testing or specific games.\nLimits: native DX12 only.",
+                    "当前配置：Pre-SR 已关闭\n推荐：优先开启 Pre-SR；直接在最终画面运行 NR 更适合兼容性测试或特定游戏。\n限制：仅支持原生 DX12。");
             ImGui::EndDisabled();''',
         "finished-picture hover help")
 
