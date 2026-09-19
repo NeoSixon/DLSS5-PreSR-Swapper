@@ -125,7 +125,10 @@ test('standalone shell uses the NR wordmark instead of the legacy green 5 tile',
   const html = read('standalone/renderer/index.html');
   const css = read('standalone/renderer/style.css');
   assert.match(html, /class="brand-mark"/);
-  assert.match(html, /class="brand-title">DLSS 5</);
+  assert.match(html, /class="brand-dlss">DLSS/);
+  assert.match(html, /class="brand-five">5/);
+  assert.doesNotMatch(html, /brand-divider/);
+  assert.doesNotMatch(html, /class="brand-title">DLSS 5</);
   assert.doesNotMatch(html, /class="logo">5</);
   assert.doesNotMatch(html, /data-i18n="productSubtitle"/);
   assert.match(css, /\.brand-mark path/);
