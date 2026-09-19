@@ -14,57 +14,57 @@ const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
-    <linearGradient id="bg" x1="120" y1="90" x2="900" y2="940" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#18232d"/>
+    <linearGradient id="bg" x1="120" y1="80" x2="900" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1b2731"/>
       <stop offset=".46" stop-color="#0b1219"/>
-      <stop offset="1" stop-color="#05090d"/>
+      <stop offset="1" stop-color="#05080c"/>
     </linearGradient>
-    <linearGradient id="edge" x1="110" y1="100" x2="920" y2="920" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#50616c" stop-opacity=".76"/>
-      <stop offset=".48" stop-color="#1f2a31" stop-opacity=".42"/>
-      <stop offset="1" stop-color="#5cf34d" stop-opacity=".58"/>
+    <linearGradient id="edge" x1="110" y1="90" x2="930" y2="930" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#687984" stop-opacity=".72"/>
+      <stop offset=".50" stop-color="#263139" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#75ed58" stop-opacity=".52"/>
     </linearGradient>
-    <linearGradient id="blade" x1="930" y1="92" x2="610" y2="560" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#b5ff7a"/>
-      <stop offset=".34" stop-color="#69f04f"/>
-      <stop offset="1" stop-color="#257f27" stop-opacity=".08"/>
+    <linearGradient id="blade" x1="930" y1="90" x2="560" y2="560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c2ff83"/>
+      <stop offset=".32" stop-color="#72f45a"/>
+      <stop offset="1" stop-color="#2b8e2a" stop-opacity=".08"/>
     </linearGradient>
-    <linearGradient id="nr" x1="235" y1="350" x2="790" y2="685" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#a4ff78"/>
-      <stop offset=".46" stop-color="#67f252"/>
-      <stop offset="1" stop-color="#4bdc43"/>
+    <linearGradient id="five" x1="300" y1="280" x2="720" y2="850" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4f8fa"/>
+      <stop offset=".62" stop-color="#dce4e8"/>
+      <stop offset="1" stop-color="#a8b6bd"/>
     </linearGradient>
-    <radialGradient id="ambient" cx="68%" cy="42%" r="56%">
-      <stop offset="0" stop-color="#69f04f" stop-opacity=".13"/>
-      <stop offset=".55" stop-color="#69f04f" stop-opacity=".035"/>
-      <stop offset="1" stop-color="#69f04f" stop-opacity="0"/>
+    <radialGradient id="ambient" cx="69%" cy="43%" r="57%">
+      <stop offset="0" stop-color="#72f45a" stop-opacity=".15"/>
+      <stop offset=".55" stop-color="#72f45a" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#72f45a" stop-opacity="0"/>
     </radialGradient>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="13"/>
+    <filter id="markShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18"/>
     </filter>
   </defs>
 
   <rect x="70" y="70" width="884" height="884" rx="210" fill="url(#bg)"/>
   <rect x="76" y="76" width="872" height="872" rx="204" fill="none" stroke="url(#edge)" stroke-width="9"/>
-  <ellipse cx="610" cy="470" rx="355" ry="330" fill="url(#ambient)"/>
+  <ellipse cx="616" cy="475" rx="360" ry="330" fill="url(#ambient)"/>
 
-  <path d="M760 76H928V238L672 494L620 410Z" fill="url(#blade)" opacity=".86"/>
-  <path d="M781 77H928V176L650 455" fill="none" stroke="#d7ffae" stroke-opacity=".24" stroke-width="10"/>
+  <path d="M755 76H929V232L664 497L610 408Z" fill="url(#blade)" opacity=".88"/>
+  <path d="M781 77H929V171L648 452" fill="none" stroke="#e0ffbf" stroke-opacity=".24" stroke-width="10"/>
 
-  <path d="M246 674V350L454 674V350H626
-           C708 350 760 393 760 457
-           C760 522 708 557 626 557H454
-           M620 557L792 686"
-        fill="none" stroke="#0b120d" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"
-        opacity=".72" filter="url(#shadow)"/>
-  <path d="M246 674V350L454 674V350H626
-           C708 350 760 393 760 457
-           C760 522 708 557 626 557H454
-           M620 557L792 686"
-        fill="none" stroke="url(#nr)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <path d="M246 674V350L454 674V350H626"
-        fill="none" stroke="#d7ffbd" stroke-width="7" stroke-linecap="round" opacity=".15"/>
+  <path d="M318 286H775L733 386H430L401 492H594
+           C738 492 819 568 819 683
+           C819 822 710 884 553 884H273L323 781H553
+           C645 781 703 749 703 685
+           C703 626 661 595 580 595H263L345 286Z"
+        fill="#000" opacity=".58" filter="url(#markShadow)"/>
+  <path d="M318 286H775L733 386H430L401 492H594
+           C738 492 819 568 819 683
+           C819 822 710 884 553 884H273L323 781H553
+           C645 781 703 749 703 685
+           C703 626 661 595 580 595H263L345 286Z"
+        fill="url(#five)"/>
+  <path d="M430 386L401 492H594" fill="none" stroke="#a5ff78" stroke-width="13" stroke-linecap="round" opacity=".72"/>
+  <path d="M323 781H553C645 781 703 749 703 685" fill="none" stroke="#72f45a" stroke-width="11" stroke-linecap="round" opacity=".38"/>
 </svg>`;
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
