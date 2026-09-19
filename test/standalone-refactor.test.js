@@ -132,6 +132,8 @@ test('standalone shell uses the NR wordmark instead of the legacy green 5 tile',
   assert.match(css, /stroke:#72f45a/);
   assert.match(css, /stroke-width:6\.5/);
   assert.match(css, /drop-shadow\(0 0 5px/);
+  assert.match(css, /\.brand-dlss\{font-weight:350\}/);
+  assert.match(css, /\.brand-five\{font-weight:850\}/);
 });
 
 test('standalone build generates and uses its own NR application icon', () => {
