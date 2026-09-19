@@ -138,6 +138,16 @@ def main() -> int:
     language_anchor = "    const float opacity = std::clamp(config->MenuBGColorA.value_or_default(), 0.50f, 0.95f);\n"
     language_block = r'''    const bool zh = config->Dlss5ManagerLanguage.value_or_default() == "zh-CN";
     const auto tr = [zh](const char* en, const char* zhCn) -> const char* { return zh ? zhCn : en; };
+    const auto hoverHelp = [&](const char* en, const char* zhCn)
+    {
+        if (!ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+            return;
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 28.0f);
+        ImGui::TextUnformatted(tr(en, zhCn));
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    };
 '''
     text = replace_once(text, language_anchor, language_anchor + language_block, "overlay language helper")
 
@@ -236,7 +246,7 @@ def main() -> int:
         ('ImGui::SliderFloat("Detail strength", &detail, 0.0f, 2.0f, "%.2f")', 'ImGui::SliderFloat(tr("Detail strength", "细节强度"), &detail, 0.0f, 2.0f, "%.2f")', 'detail strength'),
         ('ImGui::SliderFloat("Colour strength", &colour, 0.0f, 4.0f, "%.2f")', 'ImGui::SliderFloat(tr("Colour strength", "色彩强度"), &colour, 0.0f, 4.0f, "%.2f")', 'colour strength'),
         ('ImGui::CollapsingHeader("Advanced")', 'ImGui::CollapsingHeader(tr("Advanced", "高级"))', 'advanced header'),
-        ('ImGui::Checkbox("Apply to finished picture", &finishedPicture)', 'ImGui::Checkbox(tr("Apply to finished picture", "应用到最终画面"), &finishedPicture)', 'finished picture'),
+        ('ImGui::Checkbox("Apply to finished picture", &finishedPicture)', 'ImGui::Checkbox(tr("Apply to finished picture", "应用于最终画面"), &finishedPicture)', 'finished picture'),
         ('ImGui::TextDisabled("Finished-picture mode requires native DirectX 12.");', 'ImGui::TextDisabled("%s", tr("Finished-picture mode requires native DirectX 12.", "最终画面模式需要原生 DirectX 12。"));', 'finished picture hint'),
         ('ImGui::Checkbox("Apply effect (A/B preview)", &applyModel)', 'ImGui::Checkbox(tr("Apply effect (A/B preview)", "应用效果（A/B 对比）"), &applyModel)', 'A/B checkbox'),
         ('ImGui::SetTooltip("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.");', 'ImGui::SetTooltip("%s", tr("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.", "关闭可对比前后效果；神经渲染仍会运行并保持 GPU 开销。"));', 'A/B tooltip'),
@@ -252,6 +262,185 @@ def main() -> int:
     ]
     for old, new, label in replacements:
         text = replace_once(text, old, new, label)
+
+
+    # Technical controls expose concise bilingual hover help. Keep these next to the
+    # actual ImGui items so the explanation also works when an option is disabled.
+    text = replace_once(
+        text,
+        '''            if (ImGui::Checkbox(tr("Apply to finished picture", "应用于最终画面"), &finishedPicture))
+            {
+                config->DlssNrFinishedPicture = finishedPicture;
+                DlssNr::RetryAfterFailure();
+                changed = true;
+            }
+            ImGui::EndDisabled();''',
+        '''            if (ImGui::Checkbox(tr("Apply to finished picture", "应用于最终画面"), &finishedPicture))
+            {
+                config->DlssNrFinishedPicture = finishedPicture;
+                DlssNr::RetryAfterFailure();
+                changed = true;
+            }
+            hoverHelp(
+                "Run NR at the smaller input resolution, upscale the NR changes with DLSS, then apply them to the finished image. Experimental; requires native DX12 + DLSS SR and does not support Ray Reconstruction.",
+                "先在较低输入分辨率运行 NR，再用 DLSS 放大 NR 产生的变化，最后叠加到超分后的最终画面。属于实验功能；仅支持原生 DX12 + DLSS SR，不支持光线重建。");
+            ImGui::EndDisabled();''',
+        "finished-picture hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Checkbox(tr("Apply effect (A/B preview)", "应用效果（A/B 对比）"), &applyModel))
+            {
+                config->DlssNrApplyModel = applyModel;
+                changed = true;
+            }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("%s", tr("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.", "关闭可对比前后效果；神经渲染仍会运行并保持 GPU 开销。"));''',
+        '''            if (ImGui::Checkbox(tr("Apply effect (A/B preview)", "应用效果（A/B 对比）"), &applyModel))
+            {
+                config->DlssNrApplyModel = applyModel;
+                changed = true;
+            }
+            hoverHelp(
+                "Turn this off for an A/B comparison. Neural Rendering still runs in the background, so GPU cost remains.",
+                "关闭后可进行 A/B 前后对比。神经渲染仍会在后台运行，因此 GPU 开销不会消失。");''',
+        "A/B hover help")
+
+    text = replace_once(
+        text,
+        '''                    if (ImGui::Checkbox(tr("Auto skin mask", "自动皮肤遮罩"), &mask))
+                    {
+                        *autoMask = mask;
+                        changed = true;
+                    }''',
+        '''                    if (ImGui::Checkbox(tr("Auto skin mask", "自动皮肤遮罩"), &mask))
+                    {
+                        *autoMask = mask;
+                        changed = true;
+                    }
+                    hoverHelp(
+                        "Automatically detect character/skin regions so the skin-structure control targets those areas.",
+                        "自动检测人物/皮肤区域，使“皮肤结构”参数主要作用于这些区域。");''',
+        "auto-skin-mask hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Checkbox(tr("Carry Pre-SR edit across Ray Reconstruction", "将 Pre-SR 编辑保留到光线重建"), &residualAcrossRr))
+            {
+                config->DlssNrResidualAcrossRr = residualAcrossRr;
+                changed = true;
+            }''',
+        '''            if (ImGui::Checkbox(tr("Carry Pre-SR edit across Ray Reconstruction", "将 Pre-SR 调整延续至光线重建"), &residualAcrossRr))
+            {
+                config->DlssNrResidualAcrossRr = residualAcrossRr;
+                changed = true;
+            }
+            hoverHelp(
+                "Only applies with Pre-SR enabled and Ray Reconstruction active. NR runs before SR, then its adjustment is temporally carried onto the RR+SR output so RR denoising does not erase it.",
+                "仅在开启 Pre-SR 且游戏启用光线重建时生效。NR 先在超分前生成调整，再通过时间累积把这部分调整叠加到 RR+SR 输出，避免被光线重建的去噪过程抹掉。");''',
+        "RR carry hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::SliderFloat(tr("RR detail accumulation", "光线重建细节累积"), &rrBlend, 0.01f, 1.0f, "%.2f"))
+            {
+                config->DlssNrResidualAcrossRrBlend = std::clamp(rrBlend, 0.01f, 1.0f);
+                changed = true;
+            }''',
+        '''            if (ImGui::SliderFloat(tr("RR detail accumulation", "细节累积速率"), &rrBlend, 0.01f, 1.0f, "%.2f"))
+            {
+                config->DlssNrResidualAcrossRrBlend = std::clamp(rrBlend, 0.01f, 1.0f);
+                changed = true;
+            }
+            hoverHelp(
+                "How quickly the carried RR detail builds up. Lower values are steadier but slower to appear; 1.0 disables accumulation and can flicker more. Default: 0.08.",
+                "控制上述光线重建调整的累积速度。数值越低越稳定，但效果出现更慢；1.0 表示不做累积，更容易闪烁。默认值：0.08。");''',
+        "RR accumulation hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Checkbox(tr("Generate before SR, apply after SR", "超分前生成，超分后应用"), &deferred))
+            {
+                config->DlssNrDeferredDlss = deferred;
+                changed = true;
+            }''',
+        '''            if (ImGui::Checkbox(tr("Generate before SR, apply after SR", "超分前生成，超分后应用（DLSS）"), &deferred))
+            {
+                config->DlssNrDeferredDlss = deferred;
+                changed = true;
+            }
+            hoverHelp(
+                "Compute NR at input resolution, upscale only its changes with DLSS, then apply them after Super Resolution. Experimental: may flicker, adds GPU cost, and does not support Ray Reconstruction.",
+                "在输入分辨率计算 NR，只用 DLSS 放大 NR 产生的变化，再在超分后叠加。属于实验功能：可能闪烁、增加 GPU 开销，并且不支持光线重建。");''',
+        "deferred-NR hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Checkbox(tr("NR every second frame with NVIDIA FG", "配合 NVIDIA 帧生成时每隔一帧运行 NR"), &everySecond))
+            {
+                config->DlssNrResidualFg = everySecond;
+                changed = true;
+            }''',
+        '''            if (ImGui::Checkbox(tr("NR every second frame with NVIDIA FG", "启用 NVIDIA 帧生成时，每两帧运行一次 NR"), &everySecond))
+            {
+                config->DlssNrResidualFg = everySecond;
+                changed = true;
+            }
+            hoverHelp(
+                "Run NR on every other rendered frame and let NVIDIA Frame Generation interpolate the change. Adds one rendered frame of latency and may misalign effects or UI.",
+                "NR 每隔一个渲染帧运行一次，并由 NVIDIA 帧生成插值其变化。会增加一个渲染帧的延迟，部分效果或 UI 可能出现错位。");''',
+        "FG every-second-frame hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Checkbox(tr("Allow approximate FG camera guides", "允许近似的帧生成相机引导"), &approximateCamera))
+            {
+                config->DlssNrResidualFgApproxCamera = approximateCamera;
+                changed = true;
+            }''',
+        '''            if (ImGui::Checkbox(tr("Allow approximate FG camera guides", "允许使用估算相机数据辅助帧生成"), &approximateCamera))
+            {
+                config->DlssNrResidualFgApproxCamera = approximateCamera;
+                changed = true;
+            }
+            hoverHelp(
+                "Use estimated camera data when the game does not provide it. This can help Frame Generation alignment, but may create artifacts during camera movement.",
+                "游戏未提供相机数据时使用估算值辅助帧生成对齐；相机移动时可能产生伪影。");''',
+        "FG camera hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Combo(tr("Model precision", "模型精度"), &precision, precisionNames, IM_ARRAYSIZE(precisionNames)))
+            {
+                config->DlssNrPrecision = precision == 1 ? 4u : 0u;
+                changed = true;
+            }''',
+        '''            if (ImGui::Combo(tr("Model precision", "模型精度"), &precision, precisionNames, IM_ARRAYSIZE(precisionNames)))
+            {
+                config->DlssNrPrecision = precision == 1 ? 4u : 0u;
+                changed = true;
+            }
+            hoverHelp(
+                "NVIDIA FP8 is the default model path. FP8 + NVFP4 hybrid is experimental for RTX 50 GPUs; output may differ slightly and loading can briefly pause the game.",
+                "NVIDIA FP8 是默认模型精度。FP8 + NVFP4 混合模式面向 RTX 50，属于实验功能；画面结果可能略有差异，加载时游戏可能短暂停顿。");''',
+        "model-precision hover help")
+
+    text = replace_once(
+        text,
+        '''            if (ImGui::Combo(tr("HDR mapping", "HDR 映射"), &hdrMode, hdrModes, IM_ARRAYSIZE(hdrModes)))
+            {
+                config->DlssNrReversibleMode = (uint32_t) hdrMode;
+                changed = true;
+            }''',
+        '''            if (ImGui::Combo(tr("HDR mapping", "HDR 映射"), &hdrMode, hdrModes, IM_ARRAYSIZE(hdrModes)))
+            {
+                config->DlssNrReversibleMode = (uint32_t) hdrMode;
+                changed = true;
+            }
+            hoverHelp(
+                "Controls how HDR brightness is mapped for NR. Soft knee compresses highlights; Neutwo uses a reversible curve; Hybrid preserves midtones while compressing highlights. Replace modes bypass the composed strength controls and may flicker.",
+                "控制 HDR 亮度进入 NR 时的映射方式。柔和拐点会压缩高光；Neutwo 使用可逆曲线；Hybrid 尽量保留中间调并压缩高光。Replace 模式会绕过部分合成强度控制，并可能闪烁。");''',
+        "HDR-mapping hover help")
 
     # Advanced sliders reserve space for their visible label AND reset button.
     text = replace_once(text,

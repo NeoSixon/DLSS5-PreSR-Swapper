@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr9 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr10 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr9/, `${rel} should use mgr9`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr10/, `${rel} should use mgr10`);
   }
 });
 
@@ -81,4 +81,16 @@ test('add-game source buttons are neutral until the user points to one', () => {
   assert.doesNotMatch(dialog, /chooseGameFolderBtn[^\n]+autofocus/);
   assert.match(dialog, /dialog\.setAttribute\('tabindex', '-1'\)/);
   assert.match(styles, /\.add-game-sources \.add-game-source:hover/);
+});
+
+test('technical overlay controls expose bilingual hover explanations', () => {
+  const fix = read('scripts/fix-optiscaler-manager-overlay-compile.py');
+  assert.match(fix, /hoverHelp/);
+  assert.match(fix, /ImGuiHoveredFlags_AllowWhenDisabled/);
+  assert.match(fix, /应用于最终画面/);
+  assert.match(fix, /仅支持原生 DX12 \+ DLSS SR，不支持光线重建/);
+  assert.match(fix, /细节累积速率/);
+  assert.match(fix, /每两帧运行一次 NR/);
+  assert.match(fix, /估算相机数据辅助帧生成/);
+  assert.match(fix, /HDR 亮度进入 NR 时的映射方式/);
 });
