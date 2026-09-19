@@ -153,9 +153,10 @@ function applyOverlayLanguage(exePath, language) {
   let text = ini.read(file) || '';
   text = ini.set(text, 'Menu', 'DLSS5ManagerLanguage', nextLanguage);
 
-  // The bundled Hack font is Latin-only. For Chinese, point OptiScaler at a Windows CJK font
-  // if the user has not already chosen a custom TTF. The backend patch selects Chinese glyphs.
-  if (nextLanguage === 'zh-CN' && !ini.get(text, 'Menu', 'TTFFontPath')) {
+  // OptiScaler ships TTFFontPath=auto, which resolves to its bundled Hack font.
+  // Hack is Latin-only, so "auto" must be treated like no custom font for Chinese.
+  const configuredFont = String(ini.get(text, 'Menu', 'TTFFontPath') || '').trim();
+  if (nextLanguage === 'zh-CN' && (!configuredFont || /^auto$/i.test(configuredFont))) {
     const cjkFont = findCjkFont();
     if (cjkFont) text = ini.set(text, 'Menu', 'TTFFontPath', cjkFont);
   }
