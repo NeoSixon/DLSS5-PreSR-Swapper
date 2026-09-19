@@ -283,12 +283,12 @@ def main() -> int:
             }
             if (beforeSr)
                 hoverHelp(
-                    "Current: Pre-SR is on.\nRecommended: keep this off; try it only for green noise, colour issues, or post-processing conflicts.\nLimits: native DX12 + DLSS SR only; Ray Reconstruction is not supported.",
-                    "当前配置：Pre-SR 已开启\n推荐：保持关闭；出现绿色噪点、颜色异常或后处理问题时再尝试开启。\n限制：仅支持原生 DX12 + DLSS SR，不支持光线重建。");
+                    "Current: Pre-SR is on.\\nRecommended: keep this off; try it only for green noise, colour issues, or post-processing conflicts.\\nLimits: native DX12 + DLSS SR only; Ray Reconstruction is not supported.",
+                    "当前配置：Pre-SR 已开启\\n推荐：保持关闭；出现绿色噪点、颜色异常或后处理问题时再尝试开启。\\n限制：仅支持原生 DX12 + DLSS SR，不支持光线重建。");
             else
                 hoverHelp(
-                    "Current: Pre-SR is off.\nRecommended: enable Pre-SR first; running NR directly on the finished picture is better suited to compatibility testing or specific games.\nLimits: native DX12 only.",
-                    "当前配置：Pre-SR 已关闭\n推荐：优先开启 Pre-SR；直接在最终画面运行 NR 更适合兼容性测试或特定游戏。\n限制：仅支持原生 DX12。");
+                    "Current: Pre-SR is off.\\nRecommended: enable Pre-SR first; running NR directly on the finished picture is better suited to compatibility testing or specific games.\\nLimits: native DX12 only.",
+                    "当前配置：Pre-SR 已关闭\\n推荐：优先开启 Pre-SR；直接在最终画面运行 NR 更适合兼容性测试或特定游戏。\\n限制：仅支持原生 DX12。");
             ImGui::EndDisabled();''',
         "finished-picture hover help")
 
