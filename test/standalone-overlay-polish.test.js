@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr12 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr13 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr12/, `${rel} should use mgr12`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr13/, `${rel} should use mgr13`);
   }
 });
 
@@ -100,4 +100,25 @@ test('manager overlay scales font size with UI scale', () => {
   assert.match(patch, /ImGui::PushFontSize\(std::round\(fontSize \* scale\)\)/);
   assert.match(patch, /ImGui::SetWindowFontScale\(scale\)/);
   assert.match(patch, /ImGui::PopFontSize\(\)/);
+});
+
+test('manager header uses compact NR wordmark without the old square or subtitle', () => {
+  const patch = read('scripts/patch-optiscaler-compact-overlay.py');
+  assert.match(patch, /brandFontSize/);
+  assert.match(patch, /nrGreen/);
+  assert.match(patch, /"NR"/);
+  assert.match(patch, /"DLSS 5"/);
+  assert.doesNotMatch(patch, /AddRectFilled\(logoAt/);
+  assert.doesNotMatch(patch, /TextDisabled\("Neural Rendering"\)/);
+});
+
+test('later-pass auto skin mask only shows a restore icon after an override', () => {
+  const patch = read('scripts/patch-optiscaler-compact-overlay.py');
+  const fix = read('scripts/fix-optiscaler-manager-overlay-compile.py');
+  assert.match(patch, /inherit && autoMask->has_value\(\)/);
+  assert.match(patch, /InvisibleButton\("##RestoreAutoMask"/);
+  assert.match(patch, /Restore the Pass 1 setting\./);
+  assert.doesNotMatch(patch, /Reset##AutoMask/);
+  assert.match(fix, /恢复为第 1 层设置/);
+  assert.match(fix, /不只脸部/);
 });

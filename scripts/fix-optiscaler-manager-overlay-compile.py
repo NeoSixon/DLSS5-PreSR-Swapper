@@ -236,7 +236,6 @@ def main() -> int:
 
     # Main panel localization.
     replacements = [
-        ('ImGui::TextDisabled("Neural Rendering");', 'ImGui::TextDisabled(tr("Neural Rendering", "神经渲染"));', 'subtitle'),
         ('ImGui::Checkbox("Neural Rendering", &enabled)', 'ImGui::Checkbox(tr("Neural Rendering", "神经渲染"), &enabled)', 'NR checkbox'),
         ('ImGui::Checkbox("Pre-SR", &beforeSr)', 'ImGui::Checkbox(tr("Pre-SR", "Pre-SR（超分前）"), &beforeSr)', 'Pre-SR checkbox'),
         ('ImGui::SetTooltip("Run Neural Rendering before DLSS Super Resolution.");', 'ImGui::SetTooltip("%s", tr("Run Neural Rendering before DLSS Super Resolution.", "在 DLSS 超分辨率之前运行神经渲染。"));', 'Pre-SR tooltip'),
@@ -250,6 +249,7 @@ def main() -> int:
         ('ImGui::TextDisabled("Finished-picture mode requires native DirectX 12.");', 'ImGui::TextDisabled("%s", tr("Finished-picture mode requires native DirectX 12.", "最终画面模式需要原生 DirectX 12。"));', 'finished picture hint'),
         ('ImGui::Checkbox("Apply effect (A/B preview)", &applyModel)', 'ImGui::Checkbox(tr("Apply effect (A/B preview)", "应用效果（A/B 对比）"), &applyModel)', 'A/B checkbox'),
         ('ImGui::SetTooltip("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.");', 'ImGui::SetTooltip("%s", tr("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.", "关闭可对比前后效果；神经渲染仍会运行并保持 GPU 开销。"));', 'A/B tooltip'),
+        ('ImGui::SetTooltip("Restore the Pass 1 setting.");', 'ImGui::SetTooltip("%s", tr("Restore the Pass 1 setting.", "恢复为第 1 层设置。"));', 'auto mask restore tooltip'),
         ('ImGui::CollapsingHeader("Experimental")', 'ImGui::CollapsingHeader(tr("Experimental", "实验性"))', 'experimental header'),
         ('"Experimental - may cause artifacts, latency, or require restart.");', '"%s", tr("Experimental - may cause artifacts, latency, or require restart.", "实验性功能 - 可能产生伪影、延迟，或需要重启游戏。"));', 'experimental warning'),
         ('ImGui::Checkbox("Carry Pre-SR edit across Ray Reconstruction", &residualAcrossRr)', 'ImGui::Checkbox(tr("Carry Pre-SR edit across Ray Reconstruction", "将 Pre-SR 编辑保留到光线重建"), &residualAcrossRr)', 'RR residual'),
@@ -324,8 +324,8 @@ def main() -> int:
                         changed = true;
                     }
                     hoverHelp(
-                        "Automatically detect character/skin regions so the skin-structure control targets those areas.",
-                        "自动检测人物/皮肤区域，使“皮肤结构”参数主要作用于这些区域。");''',
+                        "Use the model's learned skin selection (not face-only) so Skin structure mainly targets detected skin regions. Accuracy can vary by scene.",
+                        "使用模型学习到的皮肤区域识别（不只脸部），使“皮肤结构”主要作用于识别出的皮肤区域。识别准确度会随画面变化。");''',
         "auto-skin-mask hover help")
 
     text = replace_once(
@@ -475,7 +475,6 @@ def main() -> int:
         ('deferredSlider("Local tone", tone', 'deferredSlider(tr("Local tone", "局部色调"), tone', 'local tone'),
         ('deferredSlider("Skin structure", skin', 'deferredSlider(tr("Skin structure", "皮肤结构"), skin', 'skin structure'),
         ('ImGui::Checkbox("Auto skin mask", &mask)', 'ImGui::Checkbox(tr("Auto skin mask", "自动皮肤遮罩"), &mask)', 'auto mask'),
-        ('ImGui::SmallButton("Reset##AutoMask")', 'ImGui::SmallButton(tr("Reset##AutoMask", "重置##AutoMask"))', 'auto mask reset'),
     ]:
         text = replace_once(text, old, new, label)
     text = replace_once(

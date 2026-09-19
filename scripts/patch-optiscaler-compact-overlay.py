@@ -273,21 +273,33 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         if (!useHqFont)
             ImGui::SetWindowFontScale(scale);
 
-        const float logo = 34.0f * scale;
-        const ImVec2 logoAt = ImGui::GetCursorScreenPos();
+        const ImVec2 brandAt = ImGui::GetCursorScreenPos();
         ImDrawList* draw = ImGui::GetWindowDrawList();
-        draw->AddRectFilled(logoAt, ImVec2(logoAt.x + logo, logoAt.y + logo),
-                            ImGui::GetColorU32(ImVec4(0.48f, 0.93f, 0.36f, 1.0f)), 10.0f * scale);
-        const ImVec2 five = ImGui::CalcTextSize("5");
-        draw->AddText(ImVec2(logoAt.x + (logo - five.x) * 0.5f,
-                             logoAt.y + (logo - five.y) * 0.5f),
-                      ImGui::GetColorU32(ImVec4(0.02f, 0.05f, 0.02f, 1.0f)), "5");
-        ImGui::Dummy(ImVec2(logo, logo));
-        ImGui::SameLine(0.0f, 12.0f * scale);
-        ImGui::BeginGroup();
-        ImGui::TextUnformatted("DLSS 5");
-        ImGui::TextDisabled("Neural Rendering");
-        ImGui::EndGroup();
+        const float brandFontSize = ImGui::GetFontSize() * 1.42f;
+        const float headerHeight = std::max(32.0f * scale, brandFontSize + 4.0f * scale);
+        const float nrWidth = ImGui::CalcTextSize("NR").x * 1.42f;
+        const ImU32 nrGlow = ImGui::GetColorU32(ImVec4(0.42f, 1.00f, 0.30f, 0.18f));
+        const ImU32 nrGreen = ImGui::GetColorU32(ImVec4(0.42f, 0.96f, 0.30f, 1.0f));
+        const float nrY = brandAt.y + (headerHeight - brandFontSize) * 0.5f;
+
+        // Compact NR wordmark: a restrained glow gives it identity without the old
+        // placeholder-like filled square.
+        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x - 1.0f * scale, nrY), nrGlow, "NR");
+        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x + 1.0f * scale, nrY), nrGlow, "NR");
+        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x, nrY - 1.0f * scale), nrGlow, "NR");
+        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x, nrY), nrGreen, "NR");
+
+        const float separatorX = brandAt.x + nrWidth + 12.0f * scale;
+        draw->AddLine(ImVec2(separatorX, brandAt.y + 4.0f * scale),
+                      ImVec2(separatorX, brandAt.y + headerHeight - 4.0f * scale),
+                      ImGui::GetColorU32(ImVec4(0.55f, 0.62f, 0.64f, 0.45f)), 1.0f * scale);
+
+        const ImVec2 titleSize = ImGui::CalcTextSize("DLSS 5");
+        draw->AddText(ImVec2(separatorX + 12.0f * scale,
+                             brandAt.y + (headerHeight - titleSize.y) * 0.5f),
+                      ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f)), "DLSS 5");
+
+        ImGui::Dummy(ImVec2(nrWidth + 90.0f * scale, headerHeight));
 
         const float closeWidth = 32.0f * scale;
         ImGui::SameLine();
@@ -502,14 +514,43 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
                         *autoMask = mask;
                         changed = true;
                     }
-                    if (inherit)
+                    if (inherit && autoMask->has_value())
                     {
                         ImGui::SameLine();
-                        if (ImGui::SmallButton("Reset##AutoMask"))
+                        const float restoreSize = ImGui::GetFrameHeight();
+                        if (ImGui::InvisibleButton("##RestoreAutoMask", ImVec2(restoreSize, restoreSize)))
                         {
                             autoMask->reset();
                             changed = true;
                         }
+
+                        const ImVec2 restoreMin = ImGui::GetItemRectMin();
+                        const ImVec2 restoreMax = ImGui::GetItemRectMax();
+                        const bool restoreHovered = ImGui::IsItemHovered();
+                        ImDrawList* restoreDraw = ImGui::GetWindowDrawList();
+                        if (restoreHovered)
+                            restoreDraw->AddRectFilled(restoreMin, restoreMax,
+                                ImGui::GetColorU32(ImVec4(0.16f, 0.23f, 0.23f, 0.82f)),
+                                6.0f * scale);
+
+                        const ImVec2 restoreCenter((restoreMin.x + restoreMax.x) * 0.5f,
+                                                   (restoreMin.y + restoreMax.y) * 0.5f);
+                        const float restoreRadius = restoreSize * 0.22f;
+                        const ImU32 restoreColor = ImGui::GetColorU32(
+                            restoreHovered ? ImVec4(0.72f, 0.92f, 0.72f, 1.0f)
+                                           : ImVec4(0.64f, 0.70f, 0.72f, 0.88f));
+                        restoreDraw->AddCircle(restoreCenter, restoreRadius, restoreColor, 14,
+                                               std::max(1.0f, 1.35f * scale));
+                        restoreDraw->AddTriangleFilled(
+                            ImVec2(restoreCenter.x - restoreRadius - 1.0f * scale,
+                                   restoreCenter.y - 1.0f * scale),
+                            ImVec2(restoreCenter.x - restoreRadius + 4.0f * scale,
+                                   restoreCenter.y - 5.0f * scale),
+                            ImVec2(restoreCenter.x - restoreRadius + 4.0f * scale,
+                                   restoreCenter.y + 2.0f * scale),
+                            restoreColor);
+                        if (restoreHovered)
+                            ImGui::SetTooltip("Restore the Pass 1 setting.");
                     }
                     ImGui::TreePop();
                 }
