@@ -276,51 +276,21 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         const ImVec2 brandAt = ImGui::GetCursorScreenPos();
         ImDrawList* draw = ImGui::GetWindowDrawList();
         const float headerHeight = 32.0f * scale;
-        const float nrWidth = 44.0f * scale;
-        const float nrStroke = std::max(2.0f, 3.0f * scale);
-        const ImU32 nrShadow = ImGui::GetColorU32(ImVec4(0.42f, 1.00f, 0.30f, 0.12f));
-        const ImU32 nrGreen = ImGui::GetColorU32(ImVec4(0.42f, 0.96f, 0.30f, 1.0f));
-        const float top = brandAt.y + 6.0f * scale;
-        const float mid = brandAt.y + 16.0f * scale;
-        const float bottom = brandAt.y + 26.0f * scale;
-
-        // Draw a compact technical NR wordmark from line segments. It stays sharp at
-        // small overlay sizes and avoids the softer, oversized app-icon look.
-        const auto wordmarkLine = [&](ImVec2 a, ImVec2 b)
-        {
-            const ImVec2 offset(0.8f * scale, 0.8f * scale);
-            draw->AddLine(a + offset, b + offset, nrShadow, nrStroke + 1.0f * scale);
-            draw->AddLine(a, b, nrGreen, nrStroke);
-        };
-
-        const float nx0 = brandAt.x;
-        const float nx1 = brandAt.x + 20.0f * scale;
-        wordmarkLine(ImVec2(nx0, bottom), ImVec2(nx0, top));
-        wordmarkLine(ImVec2(nx0, top), ImVec2(nx1, bottom));
-        wordmarkLine(ImVec2(nx1, bottom), ImVec2(nx1, top));
-
-        // The N's right stem is also the R's left stem.
-        const float rx0 = nx1;
-        const float rx1 = brandAt.x + 36.0f * scale;
-        wordmarkLine(ImVec2(rx0, top), ImVec2(rx1, top));
-        wordmarkLine(ImVec2(rx1, top), ImVec2(rx1, mid));
-        wordmarkLine(ImVec2(rx1, mid), ImVec2(rx0, mid));
-        wordmarkLine(ImVec2(rx0 + 8.0f * scale, mid), ImVec2(brandAt.x + 43.0f * scale, bottom));
-
-        const float titleX = brandAt.x + nrWidth + 12.0f * scale;
         const ImVec2 dlssSize = ImGui::CalcTextSize("DLSS");
         const ImVec2 fiveSize = ImGui::CalcTextSize("5");
+        const float titleX = brandAt.x;
         const float titleY = brandAt.y + (headerHeight - dlssSize.y) * 0.5f;
         const ImU32 titleColor = ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f));
+        const ImU32 fiveColor = ImGui::GetColorU32(ImVec4(0.63f, 0.96f, 0.48f, 1.0f));
 
-        // DLSS stays visually light; the attached 5 gets a slightly heavier treatment.
+        // Product identity stays simple: DLSS is light, the attached 5 carries the accent.
         draw->AddText(ImVec2(titleX, titleY), titleColor, "DLSS");
         const float fiveX = titleX + dlssSize.x;
-        draw->AddText(ImVec2(fiveX - 0.45f * scale, titleY), titleColor, "5");
-        draw->AddText(ImVec2(fiveX + 0.45f * scale, titleY), titleColor, "5");
-        draw->AddText(ImVec2(fiveX, titleY), titleColor, "5");
+        draw->AddText(ImVec2(fiveX - 0.45f * scale, titleY), fiveColor, "5");
+        draw->AddText(ImVec2(fiveX + 0.45f * scale, titleY), fiveColor, "5");
+        draw->AddText(ImVec2(fiveX, titleY), fiveColor, "5");
 
-        ImGui::Dummy(ImVec2(nrWidth + dlssSize.x + fiveSize.x + 28.0f * scale, headerHeight));
+        ImGui::Dummy(ImVec2(dlssSize.x + fiveSize.x + 24.0f * scale, headerHeight));
 
         const float closeWidth = 32.0f * scale;
         ImGui::SameLine();
