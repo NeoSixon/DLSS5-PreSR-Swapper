@@ -33,7 +33,7 @@ const svg = `
     <path d="M255 660V364L455 660V364"/>
     <path d="M565 660V364H700L776 404V500L700 540H565M700 540L792 672"/>
   </g>
-</svg>`
+</svg>`;
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:transparent}
