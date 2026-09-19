@@ -33,6 +33,7 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   const settings = read('standalone/core/nr-settings.js');
   const preload = read('standalone/preload.js');
   const compat = read('standalone/renderer/home-compat.js');
+  const app = read('standalone/renderer/app.js');
 
   assert.match(fix, /Dlss5ManagerLanguage/);
   assert.match(fix, /GetDlss5ManagerGlyphRanges/);
@@ -55,7 +56,7 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(settings, /applyOverlayLanguageToLibrary/);
   assert.match(settings, /msyh\.ttc/);
   assert.match(preload, /setOverlayLanguage/);
-  assert.match(compat, /await window\.nrApp\.setOverlayLanguage\(language\)/);
+  assert.match(app, /await window\.nrApp\.setOverlayLanguage\(language\)/);
   assert.match(compat, /overlayLanguageError/);
 });
 

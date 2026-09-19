@@ -10,7 +10,7 @@ const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
 
 test('manager backend revision enables the documented safe input fallback', () => {
   const optiscaler = read('standalone/core/optiscaler.js');
-  assert.match(optiscaler, /packageId: '0\.7\.7-dlss5mgr18'/);
+  assert.match(optiscaler, /packageId: '0\.7\.7-dlss5mgr19'/);
   assert.match(optiscaler, /\['Hotfix', 'ManualInputPolling', 'true'\]/);
   assert.match(optiscaler, /\['Hotfix', 'CheckForUpdate', 'false'\]/);
 });
@@ -20,7 +20,7 @@ test('library updates a managed backend in place instead of restore then install
   const preload = read('standalone/preload.js');
   const updater = read('standalone/core/backend-update.js');
   const optiscaler = read('standalone/core/optiscaler.js');
-  assert.match(compat, /MANAGER_BACKEND_ID = '0\.7\.7-dlss5mgr18'/);
+  assert.match(compat, /MANAGER_BACKEND_ID = '0\.7\.7-dlss5mgr19'/);
   assert.match(compat, /needsBackendUpdate/);
   assert.match(compat, /window\.nrApp\.updateBackend\(game\.id\)/);
   assert.doesNotMatch(compat, /window\.nrApp\.restore\(game\.id\)/);
@@ -62,15 +62,17 @@ test('independent manager overlay owns visibility and pass controls', () => {
   assert.doesNotMatch(patch, /DoubleSixunCompactHost/);
 });
 
-test('language picker switches immediately and syncs the in-game overlay', () => {
+test('native language dropdown persists desktop language and syncs the in-game overlay', () => {
+  const index = read('standalone/renderer/index.html');
+  const app = read('standalone/renderer/app.js');
   const compat = read('standalone/renderer/home-compat.js');
-  const optimistic = compat.indexOf('state = { ...state, language };');
-  const persist = compat.indexOf('await window.nrApp.setLanguage(language)');
-  const overlaySync = compat.indexOf('await window.nrApp.setOverlayLanguage(language)');
-  assert.ok(optimistic >= 0, 'optimistic language assignment is present');
-  assert.ok(persist > optimistic, 'visible language changes before IPC persistence finishes');
+  assert.match(index, /id="languageSelect"/);
+  const persist = app.indexOf('await window.nrApp.setLanguage(language)');
+  const overlaySync = app.indexOf('await window.nrApp.setOverlayLanguage(language)');
+  assert.ok(persist >= 0, 'desktop language is persisted from the native dropdown');
   assert.ok(overlaySync > persist, 'in-game overlay language follows persisted desktop language');
-  assert.doesNotMatch(compat, /window\.location\.reload\(\)/);
+  assert.match(compat, /installImmediateLanguagePicker\(\) \{ return \(\) => \{\}; \}/);
+  assert.doesNotMatch(app, /window\.location\.reload\(\)/);
 });
 
 test('physical shortcut suppresses the duplicate native release edge', () => {
