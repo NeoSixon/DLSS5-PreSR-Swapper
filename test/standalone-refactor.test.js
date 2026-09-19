@@ -130,6 +130,8 @@ test('standalone shell uses the NR wordmark instead of the legacy green 5 tile',
   assert.doesNotMatch(html, /data-i18n="productSubtitle"/);
   assert.match(css, /\.brand-mark path/);
   assert.match(css, /stroke:#72f45a/);
+  assert.match(css, /stroke-width:6\.5/);
+  assert.match(css, /drop-shadow\(0 0 5px/);
 });
 
 test('standalone build generates and uses its own NR application icon', () => {
@@ -143,4 +145,24 @@ test('standalone build generates and uses its own NR application icon', () => {
   assert.match(iconScript, /DLSS 5 Neural Rendering Manager standalone icon/);
   assert.match(iconScript, /build\/icon\.ico|icon\.ico/);
   assert.match(iconScript, /app-icon\.png/);
+  assert.match(iconScript, /stroke-width="46"/);
+  assert.doesNotMatch(iconScript, /stroke-width="60"/);
+});
+
+test('settings includes a Buy Me a Coffee support card with a bundled QR code', () => {
+  const html = read('standalone/renderer/index.html');
+  const app = read('standalone/renderer/app.js');
+  const preload = read('standalone/preload.js');
+  const main = read('standalone/main.js');
+  assert.match(html, /supportOpenBtn/);
+  assert.match(html, /assets\/buymeacoffee-qr\.png/);
+  assert.match(html, /buymeacoffee\.com\/NeoSixon/);
+  assert.match(app, /supportTitle: '支持开发'/);
+  assert.match(app, /window\.nrApp\.openSupport\(\)/);
+  assert.match(preload, /app:open-support/);
+  assert.match(main, /https:\/\/buymeacoffee\.com\/NeoSixon/);
+  assert.match(main, /shell\.openExternal\(SUPPORT_URL\)/);
+  const qr = path.join(root, 'standalone/renderer/assets/buymeacoffee-qr.png');
+  assert.ok(fs.existsSync(qr), 'support QR should be bundled with standalone renderer assets');
+  assert.ok(fs.statSync(qr).size > 1000, 'support QR should not be empty');
 });

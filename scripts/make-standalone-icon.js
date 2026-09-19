@@ -14,27 +14,26 @@ const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
-    <radialGradient id="ambient" cx="50%" cy="54%" r="54%">
-      <stop offset="0" stop-color="#69f05d" stop-opacity=".16"/>
-      <stop offset=".72" stop-color="#69f05d" stop-opacity=".025"/>
+    <radialGradient id="ambient" cx="50%" cy="52%" r="54%">
+      <stop offset="0" stop-color="#69f05d" stop-opacity=".08"/>
+      <stop offset=".78" stop-color="#69f05d" stop-opacity=".015"/>
       <stop offset="1" stop-color="#69f05d" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#65b96a"/>
-      <stop offset="1" stop-color="#2f6a3a"/>
-    </linearGradient>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="15" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8"/>
     </filter>
   </defs>
-  <rect x="66" y="66" width="892" height="892" rx="214" fill="#0a1118" stroke="url(#edge)" stroke-width="10"/>
-  <circle cx="512" cy="555" r="330" fill="url(#ambient)"/>
-  <g fill="none" stroke="#72f45a" stroke-width="60" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
-    <path d="M270 690V334L486 690V334"/>
-    <path d="M570 690V334H704C790 334 834 382 834 456C834 532 786 570 704 570H570M704 570L836 704"/>
+  <rect x="82" y="82" width="860" height="860" rx="186" fill="#081117" stroke="#35683c" stroke-opacity=".58" stroke-width="8"/>
+  <circle cx="512" cy="526" r="304" fill="url(#ambient)"/>
+  <g fill="none" stroke="#72f45a" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" opacity=".16" filter="url(#softGlow)">
+    <path d="M255 660V364L455 660V364"/>
+    <path d="M565 660V364H700L776 404V500L700 540H565M700 540L792 672"/>
   </g>
-</svg>`;
+  <g fill="none" stroke="#72f45a" stroke-width="46" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M255 660V364L455 660V364"/>
+    <path d="M565 660V364H700L776 404V500L700 540H565M700 540L792 672"/>
+  </g>
+</svg>`
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 html,body{margin:0;width:1024px;height:1024px;overflow:hidden;background:transparent}

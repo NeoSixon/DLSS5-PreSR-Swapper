@@ -275,27 +275,45 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
 
         const ImVec2 brandAt = ImGui::GetCursorScreenPos();
         ImDrawList* draw = ImGui::GetWindowDrawList();
-        const float brandFontSize = ImGui::GetFontSize() * 1.42f;
-        const float headerHeight = std::max(32.0f * scale, brandFontSize + 4.0f * scale);
-        const float nrWidth = ImGui::CalcTextSize("NR").x * 1.42f;
-        const ImU32 nrGlow = ImGui::GetColorU32(ImVec4(0.42f, 1.00f, 0.30f, 0.18f));
+        const float headerHeight = 32.0f * scale;
+        const float nrWidth = 48.0f * scale;
+        const float nrStroke = std::max(2.0f, 3.0f * scale);
+        const ImU32 nrShadow = ImGui::GetColorU32(ImVec4(0.42f, 1.00f, 0.30f, 0.12f));
         const ImU32 nrGreen = ImGui::GetColorU32(ImVec4(0.42f, 0.96f, 0.30f, 1.0f));
-        const float nrY = brandAt.y + (headerHeight - brandFontSize) * 0.5f;
+        const float top = brandAt.y + 6.0f * scale;
+        const float mid = brandAt.y + 16.0f * scale;
+        const float bottom = brandAt.y + 26.0f * scale;
 
-        // Compact NR wordmark: a restrained glow gives it identity without the old
-        // placeholder-like filled square.
-        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x - 1.0f * scale, nrY), nrGlow, "NR");
-        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x + 1.0f * scale, nrY), nrGlow, "NR");
-        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x, nrY - 1.0f * scale), nrGlow, "NR");
-        draw->AddText(ImGui::GetFont(), brandFontSize, ImVec2(brandAt.x, nrY), nrGreen, "NR");
+        // Draw a compact technical NR wordmark from line segments. It stays sharp at
+        // small overlay sizes and avoids the softer, oversized app-icon look.
+        const auto wordmarkLine = [&](ImVec2 a, ImVec2 b)
+        {
+            const ImVec2 offset(0.8f * scale, 0.8f * scale);
+            draw->AddLine(a + offset, b + offset, nrShadow, nrStroke + 1.0f * scale);
+            draw->AddLine(a, b, nrGreen, nrStroke);
+        };
 
-        const float separatorX = brandAt.x + nrWidth + 12.0f * scale;
-        draw->AddLine(ImVec2(separatorX, brandAt.y + 4.0f * scale),
-                      ImVec2(separatorX, brandAt.y + headerHeight - 4.0f * scale),
-                      ImGui::GetColorU32(ImVec4(0.55f, 0.62f, 0.64f, 0.45f)), 1.0f * scale);
+        const float nx0 = brandAt.x;
+        const float nx1 = brandAt.x + 20.0f * scale;
+        wordmarkLine(ImVec2(nx0, bottom), ImVec2(nx0, top));
+        wordmarkLine(ImVec2(nx0, top), ImVec2(nx1, bottom));
+        wordmarkLine(ImVec2(nx1, bottom), ImVec2(nx1, top));
+
+        const float rx0 = brandAt.x + 29.0f * scale;
+        const float rx1 = brandAt.x + 44.0f * scale;
+        wordmarkLine(ImVec2(rx0, bottom), ImVec2(rx0, top));
+        wordmarkLine(ImVec2(rx0, top), ImVec2(rx1, top));
+        wordmarkLine(ImVec2(rx1, top), ImVec2(rx1, mid));
+        wordmarkLine(ImVec2(rx1, mid), ImVec2(rx0, mid));
+        wordmarkLine(ImVec2(rx0 + 8.0f * scale, mid), ImVec2(rx1 + 3.0f * scale, bottom));
+
+        const float separatorX = brandAt.x + nrWidth + 10.0f * scale;
+        draw->AddLine(ImVec2(separatorX, brandAt.y + 5.0f * scale),
+                      ImVec2(separatorX, brandAt.y + headerHeight - 5.0f * scale),
+                      ImGui::GetColorU32(ImVec4(0.55f, 0.62f, 0.64f, 0.38f)), 1.0f * scale);
 
         const ImVec2 titleSize = ImGui::CalcTextSize("DLSS 5");
-        draw->AddText(ImVec2(separatorX + 12.0f * scale,
+        draw->AddText(ImVec2(separatorX + 11.0f * scale,
                              brandAt.y + (headerHeight - titleSize.y) * 0.5f),
                       ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f)), "DLSS 5");
 

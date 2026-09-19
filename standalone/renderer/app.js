@@ -15,6 +15,8 @@ const I18N = {
     inGame: 'In game:', keepDlssOn: 'keep DLSS Super Resolution enabled. Quality / Balanced / Performance remains a game setting.',
     gamesBody: 'Compatible games found on this PC.', settingsBody: 'Keep the interface in one language at a time.', language: 'Language', creditsTitle: 'Credits',
     creditsBody: 'With thanks to the DLSS5-Swapper and OptiScaler projects.',
+    supportTitle: 'Support development', supportBody: 'If this tool is useful to you, you can support continued development on Buy Me a Coffee.',
+    supportHint: 'Scan the QR code or open the page directly.',
     ready: 'Ready', installed: 'Installed', missing: 'Missing', runtimeReady: 'Ready', preSr: 'Pre-SR enabled', afterSr: 'After-SR placement',
     preSrLine: "Neural Rendering runs before the game's DLSS upscaling.", afterSrLine: 'Neural Rendering runs after DLSS Super Resolution.',
     preSrPipeline: 'Render → Neural Rendering → DLSS Super Resolution → Output', afterSrPipeline: 'Render → DLSS Super Resolution → Neural Rendering → Output',
@@ -38,6 +40,8 @@ const I18N = {
     inGame: '游戏内：', keepDlssOn: '保持 DLSS 超分开启；质量、平衡、性能等档位仍由游戏设置决定。',
     gamesBody: '本机扫描到的兼容游戏。', settingsBody: '界面在同一时间只显示一种语言。', language: '语言', creditsTitle: '鸣谢',
     creditsBody: '感谢 DLSS5-Swapper 与 OptiScaler 项目。',
+    supportTitle: '支持开发', supportBody: '如果这个工具对你有帮助，可以通过 Buy Me a Coffee 支持后续开发。',
+    supportHint: '扫码或直接打开页面。',
     ready: '就绪', installed: '已安装', missing: '缺失', runtimeReady: '已就绪', preSr: 'Pre-SR 已开启', afterSr: '超分后运行',
     preSrLine: '神经渲染会在游戏的 DLSS 超分之前运行。', afterSrLine: '神经渲染会在 DLSS 超分之后运行。',
     preSrPipeline: '渲染 → 神经渲染 → DLSS 超分 → 输出', afterSrPipeline: '渲染 → DLSS 超分 → 神经渲染 → 输出',
@@ -296,6 +300,13 @@ async function addGame() {
 }
 $('homeAddBtn').addEventListener('click', addGame);
 $('addGameBtn').addEventListener('click', addGame);
+
+async function openSupport() {
+  try { unwrap(await window.nrApp.openSupport()); }
+  catch (error) { toast(error.message || String(error)); }
+}
+$('supportOpenBtn').addEventListener('click', openSupport);
+$('supportQrBtn').addEventListener('click', openSupport);
 
 $('languageSelect').addEventListener('change', async event => {
   await act(async () => { state = unwrap(await window.nrApp.setLanguage(event.target.value)); scanMessage = ''; }, false);

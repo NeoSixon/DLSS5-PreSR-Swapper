@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('nrApp', Object.freeze({
   setOverlayLanguage: language => ipcRenderer.invoke('app:set-overlay-language', language),
   getOverlayPreferences: () => ipcRenderer.invoke('app:get-overlay-preferences'),
   setOverlayPreferences: preferences => ipcRenderer.invoke('app:set-overlay-preferences', preferences),
+  openSupport: () => ipcRenderer.invoke('app:open-support'),
   rescanGames: () => ipcRenderer.invoke('games:rescan'),
   addGame: () => ipcRenderer.invoke('games:add'),
   chooseGameFolder: () => ipcRenderer.invoke('games:choose-folder'),

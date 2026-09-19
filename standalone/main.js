@@ -1,6 +1,7 @@
 'use strict';
 
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const SUPPORT_URL = 'https://buymeacoffee.com/NeoSixon';
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -524,6 +525,11 @@ ipcMain.handle('game:restore', (_event, id) => safeResult(async () => {
   const logs = [];
   await fileState.restore(record.dir, entry => logs.push(entry));
   return { logs, state: await viewState({ refreshIds: [id] }) };
+}));
+
+ipcMain.handle('app:open-support', () => safeResult(async () => {
+  await shell.openExternal(SUPPORT_URL);
+  return true;
 }));
 
 ipcMain.on('window:minimize', () => win?.minimize());
