@@ -121,35 +121,22 @@ test('standalone packaging has its own DLSS 5 product identity and entry point',
   assert.doesNotMatch(config.files.join('\n'), /src\/\*\*/);
 });
 
-test('standalone shell uses the NR wordmark instead of the legacy green 5 tile', () => {
+test('standalone shell uses DLSS5 as the primary product identity', () => {
   const html = read('standalone/renderer/index.html');
   const css = read('standalone/renderer/style.css');
-  assert.match(html, /class="brand-mark"/);
+  const ux = read('standalone/renderer/ux-fixes.js');
   assert.match(html, /class="brand-dlss">DLSS/);
   assert.match(html, /class="brand-five">5/);
-  assert.doesNotMatch(html, /brand-divider/);
-  assert.doesNotMatch(html, /class="brand-title">DLSS 5</);
-  assert.doesNotMatch(html, /class="logo">5</);
-  assert.doesNotMatch(html, /data-i18n="productSubtitle"/);
-  assert.match(css, /\.brand-mark path/);
-  assert.match(css, /stroke:#72f45a/);
-  assert.match(css, /stroke-width:6\.5/);
-  assert.match(css, /drop-shadow\(0 0 5px/);
+  assert.doesNotMatch(html, /class="brand-mark"/);
+  assert.doesNotMatch(html, />NR</);
   assert.match(css, /\.brand-dlss\{font-weight:350\}/);
-  assert.match(css, /\.brand-five\{font-weight:850\}/);
-});
-
-test('desktop brand keeps the connected NR mark and does not duplicate DLSS5 at runtime', () => {
-  const html = read('standalone/renderer/index.html');
-  const ux = read('standalone/renderer/ux-fixes.js');
-  assert.match(html, /M8 46V10L40 46V10H68/);
+  assert.match(css, /\.brand-five\{font-weight:850;color:#a0f57b\}/);
   assert.match(ux, /querySelector\('\.brand-dlss'\)/);
   assert.match(ux, /querySelector\('\.brand-five'\)/);
   assert.doesNotMatch(ux, /querySelector\('\.brand strong'\)/);
-  assert.doesNotMatch(ux, /brandTitle\.textContent = 'DLSS 5'/);
 });
 
-test('standalone build generates and uses its own NR application icon', () => {
+test('standalone build generates a dedicated geometric 5 application icon', () => {
   const pkg = JSON.parse(read('package.json'));
   const main = read('standalone/main.js');
   const iconScript = read('scripts/make-standalone-icon.js');
@@ -160,10 +147,10 @@ test('standalone build generates and uses its own NR application icon', () => {
   assert.match(iconScript, /DLSS 5 Neural Rendering Manager standalone icon/);
   assert.match(iconScript, /build\/icon\.ico|icon\.ico/);
   assert.match(iconScript, /app-icon\.png/);
-  assert.match(iconScript, /stroke-width="52"/);
-  assert.match(iconScript, /M246 674V350L454 674V350H626/);
+  assert.match(iconScript, /id="five"/);
+  assert.match(iconScript, /M318 286H775L733 386H430/);
   assert.match(iconScript, /id="blade"/);
-  assert.doesNotMatch(iconScript, /stroke-width="60"/);
+  assert.doesNotMatch(iconScript, /M246 674V350L454 674V350H626/);
 });
 
 test('settings includes a Buy Me a Coffee support card with a bundled QR code', () => {
