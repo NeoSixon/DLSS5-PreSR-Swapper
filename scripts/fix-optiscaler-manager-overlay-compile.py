@@ -313,12 +313,12 @@ def main() -> int:
 
     text = replace_once(
         text,
-        '''                    if (ImGui::Checkbox(tr("Auto skin mask", "自动皮肤遮罩"), &mask))
+        '''                    if (ImGui::Checkbox("Auto skin mask", &mask))
                     {
                         *autoMask = mask;
                         changed = true;
                     }''',
-        '''                    if (ImGui::Checkbox(tr("Auto skin mask", "自动皮肤遮罩"), &mask))
+        '''                    if (ImGui::Checkbox("Auto skin mask", &mask))
                     {
                         *autoMask = mask;
                         changed = true;
