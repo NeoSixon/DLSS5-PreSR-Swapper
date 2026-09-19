@@ -452,12 +452,57 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.");
 
+            const char* restoreDefaultOne = "Restore default value: 1.00.";
+            const char* restoreDefaultSkin = "Restore default value: -1.00 (follows Local structure).";
+            const char* restoreInherited = "Restore the Pass 1 setting.";
+            const char* restoreToneZero = "Restore this pass's default value: 0.00.";
+
+            auto restoreIcon = [&](const char* id, const char* tooltip)
+            {
+                ImGui::SameLine();
+                const float restoreSize = ImGui::GetFrameHeight();
+                const bool clicked = ImGui::InvisibleButton(id, ImVec2(restoreSize, restoreSize));
+                const ImVec2 restoreMin = ImGui::GetItemRectMin();
+                const ImVec2 restoreMax = ImGui::GetItemRectMax();
+                const bool restoreHovered = ImGui::IsItemHovered();
+                ImDrawList* restoreDraw = ImGui::GetWindowDrawList();
+
+                if (restoreHovered)
+                    restoreDraw->AddRectFilled(restoreMin, restoreMax,
+                        ImGui::GetColorU32(ImVec4(0.16f, 0.23f, 0.23f, 0.82f)),
+                        6.0f * scale);
+
+                const ImVec2 restoreCenter((restoreMin.x + restoreMax.x) * 0.5f,
+                                           (restoreMin.y + restoreMax.y) * 0.5f);
+                const float restoreRadius = restoreSize * 0.22f;
+                const ImU32 restoreColor = ImGui::GetColorU32(
+                    restoreHovered ? ImVec4(0.72f, 0.92f, 0.72f, 1.0f)
+                                   : ImVec4(0.64f, 0.70f, 0.72f, 0.88f));
+                restoreDraw->AddCircle(restoreCenter, restoreRadius, restoreColor, 14,
+                                       std::max(1.0f, 1.35f * scale));
+                restoreDraw->AddTriangleFilled(
+                    ImVec2(restoreCenter.x - restoreRadius - 1.0f * scale,
+                           restoreCenter.y - 1.0f * scale),
+                    ImVec2(restoreCenter.x - restoreRadius + 4.0f * scale,
+                           restoreCenter.y - 5.0f * scale),
+                    ImVec2(restoreCenter.x - restoreRadius + 4.0f * scale,
+                           restoreCenter.y + 2.0f * scale),
+                    restoreColor);
+
+                if (restoreHovered)
+                    ImGui::SetTooltip("%s", tooltip);
+                return clicked;
+            };
+
             static std::unordered_map<ImGuiID, float> pending;
-            auto deferredSlider = [&](const char* label, auto* option, float mn, float mx, float fallback, bool inherit)
+            auto deferredSlider = [&](const char* label, auto* option, float mn, float mx, float fallback,
+                                      bool inherit, const char* restoreTooltip)
             {
                 const ImGuiID id = ImGui::GetID(label);
                 auto it = pending.find(id);
-                float value = it != pending.end() ? it->second : (option->has_value() ? option->value() : fallback);
+                const float effectiveValue = option->has_value() ? option->value() : fallback;
+                const bool canRestore = inherit ? option->has_value() : effectiveValue != fallback;
+                float value = it != pending.end() ? it->second : effectiveValue;
 
                 if (ImGui::SliderFloat(label, &value, mn, mx, "%.2f"))
                     pending[id] = value;
@@ -474,16 +519,19 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
                     }
                 }
 
-                ImGui::SameLine();
-                const std::string reset = std::string("Reset##") + label;
-                if (ImGui::SmallButton(reset.c_str()))
+                if (canRestore)
                 {
-                    if (inherit)
-                        option->reset();
-                    else
-                        *option = fallback;
-                    pending.erase(id);
-                    edited = true;
+                    ImGui::PushID(label);
+                    if (restoreIcon("##RestoreSlider", restoreTooltip))
+                    {
+                        if (inherit)
+                            option->reset();
+                        else
+                            *option = fallback;
+                        pending.erase(id);
+                        edited = true;
+                    }
+                    ImGui::PopID();
                 }
                 return edited;
             };
@@ -495,17 +543,24 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
                 ImGui::PushID(pass);
                 if (ImGui::TreeNodeEx(title.c_str(), pass == 1 ? ImGuiTreeNodeFlags_DefaultOpen : 0))
                 {
-                    if (deferredSlider("Intensity", intensity, 0.0f, 2.0f,
-                                       config->DlssNrIntensity.value_or_default(), inherit))
+                    const float intensityDefault = inherit ? config->DlssNrIntensity.value_or_default() : 1.0f;
+                    if (deferredSlider("Intensity", intensity, 0.0f, 2.0f, intensityDefault, inherit,
+                                       inherit ? restoreInherited : restoreDefaultOne))
                         changed = true;
-                    if (deferredSlider("Local structure", structure, 0.0f, 2.0f,
-                                       config->DlssNrLocalStructure.value_or_default(), inherit))
+
+                    const float structureDefault = inherit ? config->DlssNrLocalStructure.value_or_default() : 1.0f;
+                    if (deferredSlider("Local structure", structure, 0.0f, 2.0f, structureDefault, inherit,
+                                       inherit ? restoreInherited : restoreDefaultOne))
                         changed = true;
-                    const float toneDefault = inherit ? 0.0f : config->DlssNrLocalTone.value_or_default();
-                    if (deferredSlider("Local tone", tone, 0.0f, 2.0f, toneDefault, inherit))
+
+                    const float toneDefault = inherit ? 0.0f : 1.0f;
+                    if (deferredSlider("Local tone", tone, 0.0f, 2.0f, toneDefault, inherit,
+                                       inherit ? restoreToneZero : restoreDefaultOne))
                         changed = true;
-                    if (deferredSlider("Skin structure", skin, -1.0f, 2.0f,
-                                       config->DlssNrSkinStructure.value_or_default(), inherit))
+
+                    const float skinDefault = inherit ? config->DlssNrSkinStructure.value_or_default() : -1.0f;
+                    if (deferredSlider("Skin structure", skin, -1.0f, 2.0f, skinDefault, inherit,
+                                       inherit ? restoreInherited : restoreDefaultSkin))
                         changed = true;
 
                     bool mask = autoMask->has_value() ? autoMask->value() : config->DlssNrAutoMask.value_or_default();
@@ -516,41 +571,13 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
                     }
                     if (inherit && autoMask->has_value())
                     {
-                        ImGui::SameLine();
-                        const float restoreSize = ImGui::GetFrameHeight();
-                        if (ImGui::InvisibleButton("##RestoreAutoMask", ImVec2(restoreSize, restoreSize)))
+                        ImGui::PushID("AutoMask");
+                        if (restoreIcon("##RestoreAutoMask", restoreInherited))
                         {
                             autoMask->reset();
                             changed = true;
                         }
-
-                        const ImVec2 restoreMin = ImGui::GetItemRectMin();
-                        const ImVec2 restoreMax = ImGui::GetItemRectMax();
-                        const bool restoreHovered = ImGui::IsItemHovered();
-                        ImDrawList* restoreDraw = ImGui::GetWindowDrawList();
-                        if (restoreHovered)
-                            restoreDraw->AddRectFilled(restoreMin, restoreMax,
-                                ImGui::GetColorU32(ImVec4(0.16f, 0.23f, 0.23f, 0.82f)),
-                                6.0f * scale);
-
-                        const ImVec2 restoreCenter((restoreMin.x + restoreMax.x) * 0.5f,
-                                                   (restoreMin.y + restoreMax.y) * 0.5f);
-                        const float restoreRadius = restoreSize * 0.22f;
-                        const ImU32 restoreColor = ImGui::GetColorU32(
-                            restoreHovered ? ImVec4(0.72f, 0.92f, 0.72f, 1.0f)
-                                           : ImVec4(0.64f, 0.70f, 0.72f, 0.88f));
-                        restoreDraw->AddCircle(restoreCenter, restoreRadius, restoreColor, 14,
-                                               std::max(1.0f, 1.35f * scale));
-                        restoreDraw->AddTriangleFilled(
-                            ImVec2(restoreCenter.x - restoreRadius - 1.0f * scale,
-                                   restoreCenter.y - 1.0f * scale),
-                            ImVec2(restoreCenter.x - restoreRadius + 4.0f * scale,
-                                   restoreCenter.y - 5.0f * scale),
-                            ImVec2(restoreCenter.x - restoreRadius + 4.0f * scale,
-                                   restoreCenter.y + 2.0f * scale),
-                            restoreColor);
-                        if (restoreHovered)
-                            ImGui::SetTooltip("Restore the Pass 1 setting.");
+                        ImGui::PopID();
                     }
                     ImGui::TreePop();
                 }

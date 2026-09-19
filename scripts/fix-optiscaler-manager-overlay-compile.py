@@ -447,13 +447,13 @@ def main() -> int:
                 "控制 HDR 亮度进入 NR 时的映射方式。柔和拐点会压缩高光；Neutwo 使用可逆曲线；Hybrid 尽量保留中间调并压缩高光。Replace 模式会绕过部分合成强度控制，并可能闪烁。");''',
         "HDR-mapping hover help")
 
-    # Advanced sliders reserve space for their visible label AND reset button.
+    # Advanced sliders reserve room for their label and the compact restore icon only when it is visible.
     text = replace_once(text,
         '                if (ImGui::SliderFloat(label, &value, mn, mx, "%.2f"))',
         '                const float labelWidth = ImGui::CalcTextSize(label).x;\n'
-        '                const float resetWidth = ImGui::CalcTextSize(tr("Reset", "重置")).x + ImGui::GetStyle().FramePadding.x * 2.0f;\n'
-        '                const float sliderWidth = ImGui::GetContentRegionAvail().x - labelWidth - resetWidth -\n'
-        '                    ImGui::GetStyle().ItemInnerSpacing.x - ImGui::GetStyle().ItemSpacing.x;\n'
+        '                const float restoreWidth = canRestore ? ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.x : 0.0f;\n'
+        '                const float sliderWidth = ImGui::GetContentRegionAvail().x - labelWidth - restoreWidth -\n'
+        '                    ImGui::GetStyle().ItemInnerSpacing.x;\n'
         '                ImGui::SetNextItemWidth(std::max(1.0f, sliderWidth));\n'
         '                if (ImGui::SliderFloat(label, &value, mn, mx, "%.2f"))',
         'advanced slider width')
@@ -477,11 +477,22 @@ def main() -> int:
         ('ImGui::Checkbox("Auto skin mask", &mask)', 'ImGui::Checkbox(tr("Auto skin mask", "自动皮肤遮罩"), &mask)', 'auto mask'),
     ]:
         text = replace_once(text, old, new, label)
-    text = replace_once(
-        text,
-        '                const std::string reset = std::string("Reset##") + label;',
-        '                const std::string reset = std::string(zh ? "重置##" : "Reset##") + label;',
-        "localized reset button")
+    # Restore icons use contextual tooltips instead of ambiguous "Reset" labels.
+    for old, new, label in [
+        ('const char* restoreDefaultOne = "Restore default value: 1.00.";',
+         'const char* restoreDefaultOne = tr("Restore default value: 1.00.", "恢复默认值：1.00。");',
+         'restore default one tooltip'),
+        ('const char* restoreDefaultSkin = "Restore default value: -1.00 (follows Local structure).";',
+         'const char* restoreDefaultSkin = tr("Restore default value: -1.00 (follows Local structure).", "恢复默认值：-1.00（跟随局部结构）。");',
+         'restore default skin tooltip'),
+        ('const char* restoreInherited = "Restore the Pass 1 setting.";',
+         'const char* restoreInherited = tr("Restore the Pass 1 setting.", "恢复为第 1 层设置。");',
+         'restore inherited tooltip'),
+        ('const char* restoreToneZero = "Restore this pass\'s default value: 0.00.";',
+         'const char* restoreToneZero = tr("Restore this pass\'s default value: 0.00.", "恢复本层默认值：0.00。");',
+         'restore tone tooltip'),
+    ]:
+        text = replace_once(text, old, new, label)
 
     # Translate the HDR option values rather than leaving an otherwise-Chinese panel half-English.
     old_hdr = r'''            const char* hdrModes[] = { "Off (soft knee)", "Neutwo + composed", "Neutwo + replace",

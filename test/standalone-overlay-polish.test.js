@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr13 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr14 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr13/, `${rel} should use mgr13`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr14/, `${rel} should use mgr14`);
   }
 });
 
@@ -121,4 +121,18 @@ test('later-pass auto skin mask only shows a restore icon after an override', ()
   assert.doesNotMatch(patch, /Reset##AutoMask/);
   assert.match(fix, /恢复为第 1 层设置/);
   assert.match(fix, /不只脸部/);
+});
+
+test('advanced restore controls are contextual instead of always-visible Reset buttons', () => {
+  const patch = read('scripts/patch-optiscaler-compact-overlay.py');
+  const fix = read('scripts/fix-optiscaler-manager-overlay-compile.py');
+  assert.match(patch, /const bool canRestore = inherit \? option->has_value\(\) : effectiveValue != fallback/);
+  assert.match(patch, /restoreIcon\("##RestoreSlider"/);
+  assert.doesNotMatch(patch, /SmallButton\(reset\.c_str\(\)\)/);
+  assert.match(patch, /intensityDefault = inherit \? config->DlssNrIntensity\.value_or_default\(\) : 1\.0f/);
+  assert.match(patch, /toneDefault = inherit \? 0\.0f : 1\.0f/);
+  assert.match(patch, /skinDefault = inherit \? config->DlssNrSkinStructure\.value_or_default\(\) : -1\.0f/);
+  assert.match(fix, /恢复默认值：1\.00/);
+  assert.match(fix, /恢复为第 1 层设置/);
+  assert.match(fix, /恢复本层默认值：0\.00/);
 });
