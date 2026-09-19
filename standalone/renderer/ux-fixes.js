@@ -102,31 +102,8 @@
     if (subtitle) subtitle.textContent = strings().subtitle;
   }
 
-  const languageSelect = document.getElementById('languageSelect');
-  const languageField = languageSelect?.closest('.language-field');
-  if (languageSelect && languageField) {
-    const picker = document.createElement('div');
-    picker.className = 'language-choice';
-    picker.setAttribute('role', 'group');
-    const english = document.createElement('button'); english.type = 'button'; english.dataset.language = 'en';
-    const chinese = document.createElement('button'); chinese.type = 'button'; chinese.dataset.language = 'zh-CN';
-    picker.append(english, chinese); languageField.appendChild(picker);
-    const paint = language => {
-      const zh = language === 'zh-CN';
-      english.textContent = zh ? '英语' : 'English'; chinese.textContent = zh ? '简体中文' : 'Chinese (Simplified)';
-      english.classList.toggle('active', !zh); chinese.classList.toggle('active', zh);
-    };
-    const choose = async language => {
-      english.disabled = chinese.disabled = true;
-      try {
-        const result = await window.nrApp.setLanguage(language);
-        if (!result?.ok) throw new Error(result?.message || 'Unable to change language');
-        window.location.reload();
-      } catch (error) { toast(error.message || String(error)); english.disabled = chinese.disabled = false; }
-    };
-    english.addEventListener('click', () => choose('en')); chinese.addEventListener('click', () => choose('zh-CN'));
-    window.nrApp.getState().then(result => paint(result?.value?.language || 'en')).catch(() => paint('en'));
-  }
+  // Keep the language control as the native dropdown from index.html.
+
 
   function ensureMasterRow() {
     let row = document.getElementById('nrMasterRow');
@@ -163,7 +140,7 @@
     if (document.getElementById('nrInfoButton')) return;
     const placement = document.getElementById('presrToggle')?.closest('.setting-row');
     const title = placement?.querySelector('strong');
-    const details = document.querySelector('#gameDetail > .glass-card .details-card');
+    const details = document.querySelector('#gameDetail .presr-explainer');
     const content = details?.querySelector('.details-content');
     if (!placement || !title || !details || !content) return;
     const wrap = document.createElement('span'); wrap.className = 'nr-info-wrap presr-info-wrap';
@@ -182,7 +159,7 @@
     if (hero.dataset.artKey === key) return; hero.dataset.artKey = key;
     const apply = url => {
       const safe = String(url).replace(/"/g, '%22');
-      hero.style.setProperty('background-image', `linear-gradient(90deg,rgba(5,10,15,.88) 0%,rgba(5,10,15,.48) 43%,rgba(5,10,15,.12) 100%),url("${safe}")`, 'important');
+      hero.style.setProperty('background-image', `linear-gradient(90deg,rgba(5,7,9,.95) 0%,rgba(5,7,9,.80) 28%,rgba(5,7,9,.38) 58%,rgba(5,7,9,.10) 100%),url("${safe}")`, 'important');
       hero.classList.add('has-banner');
     };
     const clear = () => { hero.style.removeProperty('background-image'); hero.classList.remove('has-banner'); };
@@ -235,7 +212,7 @@
   function homeCard(game) {
     const card = document.createElement('button'); card.className = 'home-game-card'; card.type = 'button';
     const art = document.createElement('img'); art.className = 'home-game-art'; art.alt = '';
-    const primary = game.coverDataUrl || game.bannerDataUrl || ''; const fallback = game.bannerDataUrl || game.iconDataUrl || '';
+    const primary = game.tileDataUrl || game.bannerDataUrl || game.coverDataUrl || ''; const fallback = game.bannerDataUrl || game.coverDataUrl || game.iconDataUrl || '';
     if (primary) art.src = primary;
     art.addEventListener('error', () => { if (fallback && art.src !== fallback) art.src = fallback; else art.classList.add('hidden-art'); });
     const shade = document.createElement('span'); shade.className = 'home-game-shade';
@@ -348,7 +325,7 @@
   renderGame = function() {
     originalRenderGame(); ensureInfoPopover(); const game = selectedGame(); if (!game) return; const copy = strings(); const compatible = isCompatible(game);
     document.getElementById('gameDetail')?.classList.toggle('not-compatible', !compatible);
-    const heading = document.querySelector('#gameDetail .section-heading h2'); if (heading) heading.textContent = copy.sectionTitle;
+    const heading = document.querySelector('#gameDetail .neural-config-section .game-config-head h2'); if (heading) heading.textContent = copy.sectionTitle;
     const row = ensureMasterRow();
     if (row) { document.getElementById('nrMasterTitle').textContent = copy.master; document.getElementById('nrMasterBody').textContent = copy.masterBody; const enabled = document.getElementById('nrEnabledToggle'); enabled.checked = game.settings?.enabled !== false; enabled.disabled = busy || !compatible; }
     const info = document.getElementById('nrInfoButton'); if (info) info.title = copy.info;

@@ -6,12 +6,12 @@ const I18N = {
     homeTitle: 'Find compatible games', homeBody: 'Scan your installed game libraries for native DLSS titles that can use Neural Rendering.', scanGames: 'Scan games',
     compatibleGames: 'Compatible games', installedGames: 'Neural Rendering installed', openLibrary: 'Open game library', scanningGames: 'Scanning installed game libraries…',
     addFirstGameTitle: 'Add your first game', addFirstGameBody: "Choose the game's main executable. The app will detect DLSS and the rendering API.", addGame: 'Add game',
-    gameDetected: 'Game detected', neuralRendering: 'DLSS Neural Rendering', nrDescription: 'Install once, then choose whether Neural Rendering runs before DLSS Super Resolution.',
-    runBeforeSr: 'Run before DLSS Super Resolution', runBeforeSrBody: 'Enable Pre-SR. Leave it off to use the normal after-SR placement.', howItWorks: 'How it works',
-    passes: 'Passes', passStyles: 'Per-pass styles', passStylesHelp: 'Later passes can use their own style. Inherit keeps them linked to Pass 1.',
+    gameDetected: 'Game detected', neuralRendering: 'DLSS5 Neural Rendering', nrDescription: '',
+    runBeforeSr: 'Pre-SR', runBeforeSrBody: 'Choose whether Neural Rendering runs before or after DLSS Super Resolution.', howItWorks: 'How it works',
+    passes: 'Passes', passesLabel: 'Pass count', passesBody: 'Choose how many Neural Rendering passes are used.', passStyles: 'Per-pass styles', passStylesHelp: 'Later passes can use their own style. Inherit keeps them linked to Pass 1.',
     pass1: 'Pass 1', pass2: 'Pass 2', pass3: 'Pass 3', style: 'Style', backendDefault: 'Default', inheritPass1: 'Inherit Pass 1',
     standard: 'Standard', natural: 'Natural', cinematic: 'Cinematic', activeLayer: 'Active', inactiveLayer: 'Inactive',
-    runtime: 'Neural Runtime', install: 'Install Neural Rendering', importRuntime: 'Import runtime', openGameFolder: 'Open game folder', restore: 'Restore original', advanced: 'Advanced details',
+    runtime: 'Neural Runtime', runtimeBody: 'Choose or import the Neural Rendering runtime used by this game.', installRuntimeTitle: 'Installation & runtime', install: 'Install / update backend', importRuntime: 'Import runtime', openGameFolder: 'Open game folder', restoreTitle: 'Original game files', restoreBody: 'Restore the backup created before installation.', restore: 'Restore original', advanced: 'Advanced details', overlayTuneTitle: 'Tune the image in the in-game panel', overlayTuneBody: 'Image-dependent controls are easier to tune while looking at the actual game. Press Insert in game to open the panel.',
     inGame: 'In game:', keepDlssOn: 'keep DLSS Super Resolution enabled. Quality / Balanced / Performance remains a game setting.',
     gamesBody: 'Compatible games found on this PC.', settingsBody: 'Keep the interface in one language at a time.', language: 'Language', creditsTitle: 'Credits',
     creditsBody: 'With thanks to the DLSS5-Swapper and OptiScaler projects.',
@@ -31,12 +31,12 @@ const I18N = {
     homeTitle: '扫描支持神经渲染的游戏', homeBody: '扫描已安装的游戏库，查找带原生 DLSS、可使用神经渲染的游戏。', scanGames: '扫描游戏',
     compatibleGames: '兼容游戏', installedGames: '已安装神经渲染', openLibrary: '打开游戏库', scanningGames: '正在扫描已安装的游戏库…',
     addFirstGameTitle: '添加你的第一个游戏', addFirstGameBody: '选择游戏主程序，应用会自动检测 DLSS 和渲染 API。', addGame: '添加游戏',
-    gameDetected: '已检测到游戏', neuralRendering: 'DLSS 神经渲染', nrDescription: '只需安装一次，然后决定神经渲染是否在 DLSS 超分之前运行。',
-    runBeforeSr: '在 DLSS 超分前运行', runBeforeSrBody: '开启即使用 Pre-SR；关闭则使用常规的超分后位置。', howItWorks: '工作原理',
-    passes: '叠加层数', passStyles: '每层风格', passStylesHelp: '后续层可以使用不同风格；选择继承时会跟随第 1 层。',
+    gameDetected: '已检测到游戏', neuralRendering: 'DLSS5 神经渲染', nrDescription: '',
+    runBeforeSr: 'Pre-SR', runBeforeSrBody: '决定神经渲染在 DLSS 超分之前还是之后运行。', howItWorks: '工作原理',
+    passes: '层数', passesLabel: '叠加层数', passesBody: '选择神经渲染使用 1、2 或 3 层。', passStyles: '每层风格', passStylesHelp: '后续层可以使用不同风格；选择继承时会跟随第 1 层。',
     pass1: '第 1 层', pass2: '第 2 层', pass3: '第 3 层', style: '风格', backendDefault: '默认', inheritPass1: '继承第 1 层',
     standard: '标准', natural: '自然', cinematic: '电影', activeLayer: '已启用', inactiveLayer: '未启用',
-    runtime: '神经渲染运行库', install: '安装神经渲染', importRuntime: '导入运行库', openGameFolder: '打开游戏目录', restore: '恢复原文件', advanced: '高级信息',
+    runtime: '神经渲染运行库', runtimeBody: '选择或导入这个游戏使用的神经渲染运行库。', installRuntimeTitle: '安装与运行库', install: '安装 / 更新后端', importRuntime: '导入运行库', openGameFolder: '打开游戏目录', restoreTitle: '原始游戏文件', restoreBody: '恢复安装前创建的备份。', restore: '恢复原文件', advanced: '高级信息', overlayTuneTitle: '具体画面调节放在游戏内面板', overlayTuneBody: '强度、模型分辨率、局部结构、局部色调、皮肤结构和遮罩等参数需要看着实际画面实时调整。进入游戏后按 Insert 打开。',
     inGame: '游戏内：', keepDlssOn: '保持 DLSS 超分开启；质量、平衡、性能等档位仍由游戏设置决定。',
     gamesBody: '本机扫描到的兼容游戏。', settingsBody: '界面在同一时间只显示一种语言。', language: '语言', creditsTitle: '鸣谢',
     creditsBody: '感谢 DLSS5-Swapper 与 OptiScaler 项目。',
@@ -309,7 +309,12 @@ $('supportOpenBtn').addEventListener('click', openSupport);
 $('supportQrBtn').addEventListener('click', openSupport);
 
 $('languageSelect').addEventListener('change', async event => {
-  await act(async () => { state = unwrap(await window.nrApp.setLanguage(event.target.value)); scanMessage = ''; }, false);
+  const language = event.target.value;
+  await act(async () => {
+    state = unwrap(await window.nrApp.setLanguage(language));
+    scanMessage = '';
+    try { await window.nrApp.setOverlayLanguage(language); } catch {}
+  }, false);
 });
 
 $('presrToggle').addEventListener('change', async event => {

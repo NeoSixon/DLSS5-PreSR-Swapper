@@ -23,6 +23,7 @@ const PROFILE_BY_EXE = Object.freeze({
     bitness: 64,
     onlineRisk: true,
     bannerUrl: 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/3564740/library_hero.jpg',
+    tileUrl: 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/3564740/header.jpg',
     coverUrl: 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/3564740/library_600x900.jpg'
   })
 });
@@ -97,6 +98,8 @@ function normalizeRecord(exePath, meta = {}) {
     libraryDir: meta.libraryDir || path.dirname(resolved),
     bannerPath: meta.bannerPath || null,
     bannerUrl: meta.bannerUrl || null,
+    tilePath: meta.tilePath || null,
+    tileUrl: meta.tileUrl || null,
     coverPath: meta.coverPath || null,
     coverUrl: meta.coverUrl || null,
     favorite: Boolean(meta.favorite),
@@ -138,6 +141,11 @@ function localArtwork(file) {
 function bannerFor(record) {
   const profile = profileFor(record.exePath);
   return localArtwork(record.bannerPath) || record.bannerUrl || profile?.bannerUrl || null;
+}
+
+function tileFor(record) {
+  const profile = profileFor(record.exePath);
+  return localArtwork(record.tilePath) || record.tileUrl || profile?.tileUrl || null;
 }
 
 function coverFor(record) {
@@ -187,6 +195,7 @@ async function inspectRecord(record, refresh = false) {
     runtime: runtime.detect(app, record.exePath),
     iconDataUrl: await iconFor(record.exePath),
     bannerDataUrl: bannerFor(record),
+    tileDataUrl: tileFor(record),
     coverDataUrl: coverFor(record)
   };
 }
@@ -210,6 +219,7 @@ async function viewState({ refreshIds = [], refreshAll = false } = {}) {
         runtime: runtime.detect(app, record.exePath),
         iconDataUrl: await iconFor(record.exePath),
         bannerDataUrl: bannerFor(record),
+        tileDataUrl: tileFor(record),
         coverDataUrl: coverFor(record)
       });
     }
@@ -236,6 +246,8 @@ async function discoverAndMerge(refreshAll = false) {
       existing.libraryDir = game.libraryDir || existing.libraryDir;
       existing.bannerPath = game.bannerPath || existing.bannerPath;
       existing.bannerUrl = game.bannerUrl || existing.bannerUrl;
+      existing.tilePath = game.tilePath || existing.tilePath;
+      existing.tileUrl = game.tileUrl || existing.tileUrl;
       existing.coverPath = game.coverPath || existing.coverPath;
       existing.coverUrl = game.coverUrl || existing.coverUrl;
       continue;

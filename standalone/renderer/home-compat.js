@@ -5,7 +5,7 @@
 // Library page and make every page transition reset the shared content scroller.
 (() => {
   const scroller = document.querySelector('.content');
-  const MANAGER_BACKEND_ID = '0.7.7-dlss5mgr18';
+  const MANAGER_BACKEND_ID = '0.7.7-dlss5mgr19';
 
   if (I18N?.en) {
     I18N.en.games = 'Library';
@@ -43,9 +43,9 @@
   let menuPending = false;
 
   const copy = () => state.language === 'zh-CN' ? {
-    scan: '扫描游戏',
+    scan: '↻ 扫描库',
     scanning: '正在扫描…',
-    add: '添加游戏',
+    add: '＋ 添加游戏',
     all: '全部',
     compatible: 'Pre-SR 就绪',
     configured: 'DLSS5 已配置',
@@ -70,11 +70,11 @@
     backendUpdated: '游戏内后端已更新。原文件备份已保留，请重新启动游戏后再测试游戏内面板。',
     languageError: '语言切换失败。',
     overlayLanguageError: '桌面语言已切换，但游戏内 Overlay 语言同步失败。',
-    summary: (all, compatible, configured) => `${all} 个已安装游戏 · ${compatible} 个兼容 · ${configured} 个已配置`
+    favoriteAdd: '添加收藏', favoriteRemove: '取消收藏', launchMenu: '启动游戏', folderMenu: '浏览本地文件', hideMenu: '隐藏', unhideMenu: '取消隐藏', removeMenu: '从页面删除', summary: (all, compatible, configured) => `${all} 个已安装游戏 · ${compatible} 个兼容 · ${configured} 个已配置`
   } : {
-    scan: 'Scan games',
+    scan: '↻ Scan library',
     scanning: 'Scanning…',
-    add: 'Add game',
+    add: '＋ Add game',
     all: 'All',
     compatible: 'Pre-SR ready',
     configured: 'DLSS5 configured',
@@ -99,7 +99,7 @@
     backendUpdated: 'In-game backend updated. The original-file backup was preserved. Restart the game before testing the overlay.',
     languageError: 'Unable to change language.',
     overlayLanguageError: 'Desktop language changed, but the in-game overlay language could not be synchronized.',
-    summary: (all, compatible, configured) => `${all} installed · ${compatible} compatible · ${configured} configured`
+    favoriteAdd: 'Add favorite', favoriteRemove: 'Remove favorite', launchMenu: 'Launch game', folderMenu: 'Browse local files', hideMenu: 'Hide', unhideMenu: 'Unhide', removeMenu: 'Remove from library', summary: (all, compatible, configured) => `${all} installed · ${compatible} compatible · ${configured} configured`
   };
 
   function ensureLibraryToolbar() {
@@ -167,7 +167,7 @@
     const art = document.createElement('img');
     art.className = 'home-game-art';
     art.alt = '';
-    const primary = game.coverDataUrl || game.bannerDataUrl || game.iconDataUrl || '';
+    const primary = game.tileDataUrl || game.bannerDataUrl || game.coverDataUrl || game.iconDataUrl || '';
     const fallback = game.bannerDataUrl || game.iconDataUrl || '';
     if (primary) art.src = primary;
     art.addEventListener('error', () => {
@@ -220,7 +220,7 @@
     card.addEventListener('keydown', event => {
       if (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) {
         event.preventDefault();
-        openMenu(game);
+        openMenu(game, card);
       } else if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         open();
@@ -229,38 +229,86 @@
     card.addEventListener('contextmenu', event => {
       event.preventDefault();
       event.stopPropagation();
-      openMenu(game);
+      openMenu(game, event);
     });
     return card;
   }
 
-  async function openMenu(game) {
+  let contextMenu = null;
+  let contextGameId = null;
+
+  function dismissContextMenu() {
+    contextMenu?.classList.remove('show');
+    contextGameId = null;
+  }
+
+  function ensureContextMenu() {
+    if (contextMenu) return contextMenu;
+    contextMenu = document.createElement('div');
+    contextMenu.id = 'gameContextMenu';
+    contextMenu.className = 'game-context-menu';
+    contextMenu.innerHTML = `
+      <button type="button" data-context-action="favorite"></button>
+      <button type="button" data-context-action="launch"></button>
+      <button type="button" data-context-action="folder"></button>
+      <div class="context-menu-separator"></div>
+      <button type="button" data-context-action="hidden"></button>
+      <button type="button" class="context-danger" data-context-action="remove"></button>`;
+    document.body.appendChild(contextMenu);
+    contextMenu.addEventListener('click', async event => {
+      const button = event.target.closest('[data-context-action]');
+      const id = contextGameId;
+      if (!button || !id || menuPending) return;
+      const action = button.dataset.contextAction;
+      dismissContextMenu();
+      menuPending = true;
+      try {
+        await act(async () => {
+          const current = state.games.find(item => item.id === id);
+          if (!current) return;
+          if (action === 'launch') {
+            unwrap(await window.nrApp.launchGame(id)); toast(copy().launching);
+          } else if (action === 'folder') {
+            unwrap(await window.nrApp.openGameFolder(id));
+          } else if (action === 'favorite') {
+            state = unwrap(await window.nrApp.setGameFavorite(id, !current.favorite));
+          } else if (action === 'hidden') {
+            state = unwrap(await window.nrApp.setGameHidden(id, !current.hidden));
+            toast(current.hidden ? copy().unhiddenNotice : copy().hiddenNotice);
+          } else if (action === 'remove') {
+            state = unwrap(await window.nrApp.removeGame(id)); toast(copy().removedNotice);
+          }
+        });
+      } catch (error) { toast(error.message || String(error)); }
+      finally { menuPending = false; }
+    });
+    document.addEventListener('pointerdown', event => { if (!contextMenu.contains(event.target)) dismissContextMenu(); });
+    window.addEventListener('blur', dismissContextMenu);
+    scroller?.addEventListener('scroll', dismissContextMenu, { passive: true });
+    return contextMenu;
+  }
+
+  function openMenu(game, source) {
     if (busy || menuPending) return;
-    menuPending = true;
-    try {
-      const action = unwrap(await window.nrApp.showGameMenu(game.id));
-      if (!action) return;
-      await act(async () => {
-        const current = state.games.find(item => item.id === game.id);
-        if (!current) return;
-        if (action === 'launch') {
-          unwrap(await window.nrApp.launchGame(game.id));
-          toast(copy().launching);
-        } else if (action === 'folder') {
-          unwrap(await window.nrApp.openGameFolder(game.id));
-        } else if (action === 'favorite') {
-          state = unwrap(await window.nrApp.setGameFavorite(game.id, !current.favorite));
-        } else if (action === 'hidden') {
-          state = unwrap(await window.nrApp.setGameHidden(game.id, !current.hidden));
-          toast(current.hidden ? copy().unhiddenNotice : copy().hiddenNotice);
-        } else if (action === 'remove') {
-          state = unwrap(await window.nrApp.removeGame(game.id));
-          toast(copy().removedNotice);
-        }
-      });
-    } catch (error) { toast(error.message || String(error)); }
-    finally { menuPending = false; }
-    document.querySelector(`[data-game-id="${game.id}"]`)?.focus();
+    const menu = ensureContextMenu();
+    const c = copy();
+    const current = state.games.find(item => item.id === game.id) || game;
+    contextGameId = game.id;
+    menu.querySelector('[data-context-action="favorite"]').textContent = current.favorite ? `★ ${c.favoriteRemove}` : `☆ ${c.favoriteAdd}`;
+    menu.querySelector('[data-context-action="launch"]').textContent = `▶ ${c.launchMenu}`;
+    menu.querySelector('[data-context-action="folder"]').textContent = `▣ ${c.folderMenu}`;
+    menu.querySelector('[data-context-action="hidden"]').textContent = current.hidden ? c.unhideMenu : c.hideMenu;
+    menu.querySelector('[data-context-action="remove"]').textContent = c.removeMenu;
+    let x=20,y=20;
+    if (source?.clientX !== undefined) { x=source.clientX; y=source.clientY; }
+    else {
+      const rect=source?.getBoundingClientRect?.() || document.querySelector(`[data-game-id="${game.id}"]`)?.getBoundingClientRect();
+      if (rect) { x=rect.left+20; y=rect.top+20; }
+    }
+    menu.classList.add('show');
+    const rect=menu.getBoundingClientRect();
+    menu.style.left=`${Math.max(8,Math.min(x,window.innerWidth-rect.width-8))}px`;
+    menu.style.top=`${Math.max(8,Math.min(y,window.innerHeight-rect.height-8))}px`;
   }
 
   renderGames = function() {
@@ -349,59 +397,7 @@
     }
   };
 
-  function installImmediateLanguagePicker() {
-    const oldPicker = document.querySelector('.language-choice');
-    if (!oldPicker?.parentElement) return () => {};
-
-    const picker = oldPicker.cloneNode(false);
-    oldPicker.replaceWith(picker);
-    const english = document.createElement('button');
-    const chinese = document.createElement('button');
-    english.type = chinese.type = 'button';
-    english.dataset.language = 'en';
-    chinese.dataset.language = 'zh-CN';
-    picker.append(english, chinese);
-
-    const paint = () => {
-      const zh = state.language === 'zh-CN';
-      english.textContent = zh ? '英语' : 'English';
-      chinese.textContent = zh ? '简体中文' : 'Chinese (Simplified)';
-      english.classList.toggle('active', !zh);
-      chinese.classList.toggle('active', zh);
-    };
-
-    const choose = async language => {
-      if (language === state.language) return;
-      const previous = state.language;
-      state = { ...state, language };
-      paint();
-      render();
-      english.disabled = chinese.disabled = true;
-      try {
-        const result = await window.nrApp.setLanguage(language);
-        if (!result?.ok) throw new Error(result?.message || copy().languageError);
-        if (result.value && typeof result.value === 'object') state = { ...state, ...result.value, language };
-        try {
-          const overlay = await window.nrApp.setOverlayLanguage(language);
-          if (!overlay?.ok) toast(overlay?.message || copy().overlayLanguageError);
-        } catch {
-          toast(copy().overlayLanguageError);
-        }
-      } catch (error) {
-        state = { ...state, language: previous };
-        toast(error.message || String(error));
-      } finally {
-        english.disabled = chinese.disabled = false;
-        paint();
-        render();
-      }
-    };
-
-    english.addEventListener('click', () => choose('en'));
-    chinese.addEventListener('click', () => choose('zh-CN'));
-    paint();
-    return paint;
-  }
+  function installImmediateLanguagePicker() { return () => {}; }
 
   function ensureBackendUpdateButton() {
     let button = document.getElementById('backendUpdateBtn');

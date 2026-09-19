@@ -228,26 +228,26 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
                              ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_AlwaysAutoResize;
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 20.0f * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 18.0f) * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 7.0f * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 7.0f) * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10.0f, 9.0f) * scale);
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.025f, 0.040f, 0.052f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.50f, 0.93f, 0.39f, 0.34f));
-    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.52f, 0.96f, 0.42f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.085f, 0.115f, 0.135f, 0.86f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.12f, 0.17f, 0.19f, 0.94f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.15f, 0.22f, 0.23f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25f, 0.52f, 0.25f, 0.48f));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.32f, 0.66f, 0.31f, 0.62f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.52f, 0.94f, 0.42f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.62f, 1.0f, 0.52f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.14f, 0.16f, 0.92f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.16f, 0.23f, 0.23f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.22f, 0.34f, 0.28f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.106f, 0.110f, 0.118f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.188f, 0.196f, 0.212f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.568f, 0.839f, 0.106f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.125f, 0.129f, 0.141f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.165f, 0.173f, 0.188f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.196f, 0.208f, 0.227f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.153f, 0.220f, 0.051f, 0.90f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.208f, 0.306f, 0.071f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.463f, 0.725f, 0.000f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.568f, 0.839f, 0.106f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.133f, 0.141f, 0.157f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.165f, 0.173f, 0.188f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.204f, 0.216f, 0.231f, 1.0f));
 
     // Scale text with the panel. The manager already scales layout metrics with
     // menuResScale, so leaving the font at its base size makes 125/150% look
@@ -281,7 +281,7 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         const float titleX = brandAt.x;
         const float titleY = brandAt.y + (headerHeight - dlssSize.y) * 0.5f;
         const ImU32 titleColor = ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f));
-        const ImU32 fiveColor = ImGui::GetColorU32(ImVec4(0.63f, 0.96f, 0.48f, 1.0f));
+        const ImU32 fiveColor = ImGui::GetColorU32(ImVec4(0.568f, 0.839f, 0.106f, 1.0f));
 
         // Product identity stays simple: DLSS is light, the attached 5 carries the accent.
         draw->AddText(ImVec2(titleX, titleY), titleColor, "DLSS");
@@ -333,8 +333,8 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
             const bool selected = passes == pass;
             if (selected)
             {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.48f, 0.91f, 0.34f, 0.95f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.55f, 0.98f, 0.41f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.463f, 0.725f, 0.000f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.529f, 0.792f, 0.067f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.02f, 0.06f, 0.02f, 1.0f));
             }
 
@@ -673,7 +673,7 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         if (!enabled)
             ImGui::TextDisabled("Off");
         else if (running)
-            ImGui::TextColored(ImVec4(0.52f, 0.94f, 0.42f, 1.0f), "%s - %d pass%s",
+            ImGui::TextColored(ImVec4(0.463f, 0.725f, 0.000f, 1.0f), "%s - %d pass%s",
                                beforeSr ? "Pre-SR active" : "After-SR active", passes, passes == 1 ? "" : "es");
         else
             ImGui::TextColored(ImVec4(0.90f, 0.72f, 0.34f, 1.0f), "Waiting for DLSS / rendered scene");

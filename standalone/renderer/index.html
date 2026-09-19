@@ -74,6 +74,7 @@
         <section class="page" id="page-game">
           <div class="game-page-toolbar">
             <button class="ghost compact" id="gameBackBtn"><span>←</span> <span data-i18n="games">Games</span></button>
+            <button class="ghost compact" id="folderBtn" data-i18n="openGameFolder">Open game folder</button>
           </div>
 
           <div id="gameEmptyState" class="empty-state hidden">
@@ -89,87 +90,96 @@
               </div>
             </section>
 
-            <div class="section-heading">
-              <div>
-                <h2 data-i18n="neuralRendering">DLSS Neural Rendering</h2>
-                <p data-i18n="nrDescription">Install once, then choose whether Neural Rendering runs before DLSS Super Resolution.</p>
+            <section class="game-config-section neural-config-section">
+              <div class="game-config-head">
+                <h2 data-i18n="neuralRendering">DLSS5 Neural Rendering</h2>
+                <span class="state-chip" id="installState">Ready</span>
               </div>
-              <span class="state-chip" id="installState">Ready</span>
-            </div>
-
-            <section class="glass-card">
-              <div class="setting-row main-setting">
-                <div>
-                  <strong data-i18n="runBeforeSr">Run before DLSS Super Resolution</strong>
-                  <p data-i18n="runBeforeSrBody">Enable Pre-SR. Leave it off to use the normal after-SR placement.</p>
+              <div class="game-config-body">
+                <div class="setting-row main-setting">
+                  <div>
+                    <strong data-i18n="runBeforeSr">Pre-SR</strong>
+                    <p data-i18n="runBeforeSrBody">Choose whether Neural Rendering runs before or after DLSS Super Resolution.</p>
+                  </div>
+                  <label class="switch">
+                    <input id="presrToggle" type="checkbox" checked />
+                    <span></span>
+                  </label>
                 </div>
-                <label class="switch">
-                  <input id="presrToggle" type="checkbox" checked />
-                  <span></span>
-                </label>
-              </div>
 
-              <div class="mode-line">
-                <span class="mode-badge" id="modeBadge">Pre-SR</span>
-                <span id="modeText"></span>
-              </div>
-
-              <details class="details-card">
-                <summary><span data-i18n="howItWorks">How it works</span><span>⌄</span></summary>
-                <div class="details-content">
-                  <div class="pipeline" id="pipeline"></div>
-                  <p id="pipelineExplain"></p>
+                <div class="mode-line">
+                  <span class="mode-badge" id="modeBadge">Pre-SR</span>
+                  <span id="modeText"></span>
                 </div>
-              </details>
+
+                <details class="details-card presr-explainer">
+                  <summary><span data-i18n="howItWorks">How it works</span><span>⌄</span></summary>
+                  <div class="details-content">
+                    <div class="pipeline" id="pipeline"></div>
+                    <p id="pipelineExplain"></p>
+                  </div>
+                </details>
+              </div>
             </section>
 
-            <section class="glass-card controls-card">
-              <div class="control-grid">
-                <label class="field">
-                  <span data-i18n="passes">Passes</span>
-                  <select id="passesSelect">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                  </select>
-                </label>
-                <div class="field runtime-field">
-                  <span data-i18n="runtime">Neural Runtime</span>
-                  <div class="runtime-status" id="runtimeStatus">—</div>
+            <section class="game-config-section passes-config-section">
+              <div class="game-config-head"><h2 data-i18n="passes">Passes</h2></div>
+              <div class="game-config-body">
+                <div class="passes-setting-row">
+                  <div>
+                    <strong data-i18n="passesLabel">Pass count</strong>
+                    <p data-i18n="passesBody">Choose how many Neural Rendering passes are used.</p>
+                  </div>
+                  <select id="passesSelect"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
                 </div>
-                <button class="primary install-button" id="installBtn" data-i18n="install">Install Neural Rendering</button>
-              </div>
 
-              <details class="details-card pass-profiles" id="passStylesDetails">
-                <summary><span data-i18n="passStyles">Per-pass styles</span><span>⌄</span></summary>
-                <div class="pass-style-grid">
-                  <div class="pass-card" data-pass-card="1">
-                    <div class="pass-card-head"><b data-i18n="pass1">Pass 1</b><small id="pass1State"></small></div>
-                    <label class="field compact-field"><span data-i18n="style">Style</span><select id="pass1Style"><option value="auto" data-i18n="backendDefault">Default</option><option value="0" data-i18n="standard">Standard</option><option value="1" data-i18n="natural">Natural</option><option value="2" data-i18n="cinematic">Cinematic</option></select></label>
+                <details class="details-card pass-profiles" id="passStylesDetails">
+                  <summary><span data-i18n="passStyles">Per-pass styles</span><span>⌄</span></summary>
+                  <div class="pass-style-grid">
+                    <div class="pass-card" data-pass-card="1">
+                      <div class="pass-card-head"><b data-i18n="pass1">Pass 1</b><small id="pass1State"></small></div>
+                      <label class="field compact-field"><span data-i18n="style">Style</span><select id="pass1Style"><option value="auto" data-i18n="backendDefault">Default</option><option value="0" data-i18n="standard">Standard</option><option value="1" data-i18n="natural">Natural</option><option value="2" data-i18n="cinematic">Cinematic</option></select></label>
+                    </div>
+                    <div class="pass-card" data-pass-card="2">
+                      <div class="pass-card-head"><b data-i18n="pass2">Pass 2</b><small id="pass2State"></small></div>
+                      <label class="field compact-field"><span data-i18n="style">Style</span><select id="pass2Style"><option value="auto" data-i18n="inheritPass1">Inherit Pass 1</option><option value="0" data-i18n="standard">Standard</option><option value="1" data-i18n="natural">Natural</option><option value="2" data-i18n="cinematic">Cinematic</option></select></label>
+                    </div>
+                    <div class="pass-card" data-pass-card="3">
+                      <div class="pass-card-head"><b data-i18n="pass3">Pass 3</b><small id="pass3State"></small></div>
+                      <label class="field compact-field"><span data-i18n="style">Style</span><select id="pass3Style"><option value="auto" data-i18n="inheritPass1">Inherit Pass 1</option><option value="0" data-i18n="standard">Standard</option><option value="1" data-i18n="natural">Natural</option><option value="2" data-i18n="cinematic">Cinematic</option></select></label>
+                    </div>
                   </div>
-                  <div class="pass-card" data-pass-card="2">
-                    <div class="pass-card-head"><b data-i18n="pass2">Pass 2</b><small id="pass2State"></small></div>
-                    <label class="field compact-field"><span data-i18n="style">Style</span><select id="pass2Style"><option value="auto" data-i18n="inheritPass1">Inherit Pass 1</option><option value="0" data-i18n="standard">Standard</option><option value="1" data-i18n="natural">Natural</option><option value="2" data-i18n="cinematic">Cinematic</option></select></label>
-                  </div>
-                  <div class="pass-card" data-pass-card="3">
-                    <div class="pass-card-head"><b data-i18n="pass3">Pass 3</b><small id="pass3State"></small></div>
-                    <label class="field compact-field"><span data-i18n="style">Style</span><select id="pass3Style"><option value="auto" data-i18n="inheritPass1">Inherit Pass 1</option><option value="0" data-i18n="standard">Standard</option><option value="1" data-i18n="natural">Natural</option><option value="2" data-i18n="cinematic">Cinematic</option></select></label>
-                  </div>
+                  <p class="pass-help" data-i18n="passStylesHelp">Later passes can use their own style. Inherit keeps them linked to Pass 1.</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="game-config-section runtime-config-section">
+              <div class="game-config-head"><h2 data-i18n="installRuntimeTitle">Installation & runtime</h2></div>
+              <div class="game-config-body runtime-config-body">
+                <div class="runtime-config-row">
+                  <div><strong data-i18n="runtime">Neural Runtime</strong><p data-i18n="runtimeBody">Choose or import the Neural Rendering runtime used by this game.</p></div>
+                  <div class="runtime-config-actions"><div class="runtime-status" id="runtimeStatus">—</div><button class="ghost" id="runtimeBtn" data-i18n="importRuntime">Import runtime</button></div>
                 </div>
-                <p class="pass-help" data-i18n="passStylesHelp">Later passes can use their own style. Inherit keeps them linked to Pass 1.</p>
-              </details>
-
-              <div class="utility-row">
-                <button class="ghost" id="runtimeBtn" data-i18n="importRuntime">Import runtime</button>
-                <button class="ghost" id="folderBtn" data-i18n="openGameFolder">Open game folder</button>
-                <button class="ghost danger" id="restoreBtn" data-i18n="restore">Restore original</button>
-                <span class="inline-status" id="inlineStatus"></span>
+                <div class="runtime-config-row">
+                  <div><strong data-i18n="backend">Backend</strong><p>OptiScaler Pre-SR · v0.7.7</p></div>
+                  <div class="runtime-config-actions"><button class="primary install-button" id="installBtn" data-i18n="install">Install Neural Rendering</button><span class="inline-status" id="inlineStatus"></span></div>
+                </div>
+                <div class="runtime-config-row">
+                  <div><strong data-i18n="restoreTitle">Original game files</strong><p data-i18n="restoreBody">Restore the backup created before installation.</p></div>
+                  <div class="runtime-config-actions"><button class="ghost danger" id="restoreBtn" data-i18n="restore">Restore original</button></div>
+                </div>
+                <details class="details-card advanced">
+                  <summary><span data-i18n="advanced">Advanced details</span><span>⌄</span></summary>
+                  <div class="tech-grid" id="techGrid"></div>
+                </details>
               </div>
+            </section>
 
-              <details class="details-card advanced">
-                <summary><span data-i18n="advanced">Advanced details</span><span>⌄</span></summary>
-                <div class="tech-grid" id="techGrid"></div>
-              </details>
+            <section class="overlay-tuning-card">
+              <div class="overlay-tuning-icon">▣</div>
+              <div><strong data-i18n="overlayTuneTitle">Tune the image in the in-game panel</strong><p data-i18n="overlayTuneBody">Image-dependent controls are easier to tune while looking at the actual game. Press Insert in game to open the panel.</p></div>
+              <kbd>Insert</kbd>
             </section>
           </div>
         </section>

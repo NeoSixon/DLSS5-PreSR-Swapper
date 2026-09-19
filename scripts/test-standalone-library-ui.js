@@ -12,8 +12,9 @@ async function runLibraryUISmoke() {
   };
   const card = id => document.querySelector(`[data-game-id="${id}"]`);
   const menu = async (id, action) => {
-    window.nrTest.menu(action);
-    card(id).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    card(id).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 120, clientY: 120 }));
+    await waitFor(() => document.querySelector('#gameContextMenu.show'));
+    document.querySelector(`#gameContextMenu [data-context-action="${action}"]`).click();
     await new Promise(resolve => setTimeout(resolve, 60));
   };
   showPage('games');
@@ -73,8 +74,10 @@ async function runLibraryUISmoke() {
   check(!document.querySelector('dialog'), 'Late scan reopened a cancelled dialog');
   check(window.nrTest.stats().adds === 1, 'Cancelled folder scan changed the library');
   window.nrTest.delayFolder(false);
-  document.querySelector('.language-choice [data-language="zh-CN"]').click();
-  await waitFor(() => state.language === 'zh-CN' && !document.querySelector('.language-choice [data-language="zh-CN"]').disabled);
+  const languageSelect = document.getElementById('languageSelect');
+  languageSelect.value = 'zh-CN';
+  languageSelect.dispatchEvent(new Event('change', { bubbles: true }));
+  await waitFor(() => state.language === 'zh-CN' && !languageSelect.disabled);
   document.getElementById('addGameBtn').click();
   check(document.getElementById('addGameTitle').textContent === '添加游戏', 'Add dialog is not localized');
   document.getElementById('chooseGameFolderBtn').click();

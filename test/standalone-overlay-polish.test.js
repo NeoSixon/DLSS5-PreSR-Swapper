@@ -59,12 +59,12 @@ test('desktop language is mirrored into managed in-game overlays with CJK glyph 
   assert.match(compat, /overlayLanguageError/);
 });
 
-test('manager backend revision is mgr18 everywhere user-facing update detection relies on it', () => {
+test('manager backend revision is mgr19 everywhere user-facing update detection relies on it', () => {
   for (const rel of [
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr18/, `${rel} should use mgr18`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr19/, `${rel} should use mgr19`);
   }
 });
 

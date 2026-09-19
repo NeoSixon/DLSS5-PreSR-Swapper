@@ -52,6 +52,10 @@ function steamBanner(entry) {
   return nestedSteamArtwork(entry, ['library_hero.jpg', 'library_header.jpg', 'header.jpg']);
 }
 
+function steamTile(entry) {
+  return nestedSteamArtwork(entry, ['library_header.jpg', 'header.jpg', 'library_hero.jpg']);
+}
+
 function steamCover(entry) {
   return nestedSteamArtwork(entry, ['library_600x900.jpg', 'library_capsule.jpg']);
 }
@@ -59,6 +63,11 @@ function steamCover(entry) {
 function steamBannerUrl(entry) {
   if (entry.launcher !== 'Steam' || !entry.id) return null;
   return `https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/${encodeURIComponent(String(entry.id))}/library_hero.jpg`;
+}
+
+function steamTileUrl(entry) {
+  if (entry.launcher !== 'Steam' || !entry.id) return null;
+  return `https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/${encodeURIComponent(String(entry.id))}/header.jpg`;
 }
 
 function steamCoverUrl(entry) {
@@ -143,6 +152,8 @@ async function inspectEntry(entry) {
     libraryDir: entry.dir,
     bannerPath: steamBanner(entry) || (entry.poster && entry.poster.tall === false ? entry.poster.file : null),
     bannerUrl: steamBannerUrl(entry),
+    tilePath: steamTile(entry) || (entry.poster && entry.poster.tall === false ? entry.poster.file : null),
+    tileUrl: steamTileUrl(entry),
     coverPath: steamCover(entry) || (entry.poster && entry.poster.tall === true ? entry.poster.file : null),
     coverUrl: steamCoverUrl(entry)
   };
@@ -172,8 +183,10 @@ module.exports = {
   candidatesFor,
   inspectEntry,
   steamBanner,
+  steamTile,
   steamCover,
   steamBannerUrl,
+  steamTileUrl,
   steamCoverUrl,
   pathDistance
 };
