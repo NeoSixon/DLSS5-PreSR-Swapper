@@ -120,3 +120,27 @@ test('standalone packaging has its own DLSS 5 product identity and entry point',
   assert.match(config.files.join('\n'), /standalone\/\*\*\/\*/);
   assert.doesNotMatch(config.files.join('\n'), /src\/\*\*/);
 });
+
+test('standalone shell uses the NR wordmark instead of the legacy green 5 tile', () => {
+  const html = read('standalone/renderer/index.html');
+  const css = read('standalone/renderer/style.css');
+  assert.match(html, /class="brand-mark"/);
+  assert.match(html, /class="brand-title">DLSS 5</);
+  assert.doesNotMatch(html, /class="logo">5</);
+  assert.doesNotMatch(html, /data-i18n="productSubtitle"/);
+  assert.match(css, /\.brand-mark path/);
+  assert.match(css, /stroke:#72f45a/);
+});
+
+test('standalone build generates and uses its own NR application icon', () => {
+  const pkg = JSON.parse(read('package.json'));
+  const main = read('standalone/main.js');
+  const iconScript = read('scripts/make-standalone-icon.js');
+  assert.equal(pkg.scripts['icon:standalone'], 'electron scripts/make-standalone-icon.js');
+  assert.equal(pkg.scripts['prebuild:standalone:portable'], 'npm run icon:standalone');
+  assert.equal(pkg.scripts['prestart:standalone'], 'npm run icon:standalone');
+  assert.match(main, /renderer['"], 'app-icon\.png/);
+  assert.match(iconScript, /DLSS 5 Neural Rendering Manager standalone icon/);
+  assert.match(iconScript, /build\/icon\.ico|icon\.ico/);
+  assert.match(iconScript, /app-icon\.png/);
+});

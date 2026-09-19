@@ -306,6 +306,7 @@ function createWindow() {
     minHeight: 680,
     frame: false,
     show: false,
+    icon: path.join(__dirname, 'renderer', 'app-icon.png'),
     backgroundColor: '#0b1117',
     ...(process.platform === 'win32' ? { backgroundMaterial: 'mica' } : {}),
     webPreferences: {
