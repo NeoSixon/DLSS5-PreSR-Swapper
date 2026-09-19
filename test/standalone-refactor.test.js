@@ -136,21 +136,22 @@ test('standalone shell uses DLSS5 as the primary product identity', () => {
   assert.doesNotMatch(ux, /querySelector\('\.brand strong'\)/);
 });
 
-test('standalone build generates a dedicated geometric 5 application icon', () => {
+test('standalone build generates the approved flat 5 Manager application icon', () => {
   const pkg = JSON.parse(read('package.json'));
   const main = read('standalone/main.js');
   const iconScript = read('scripts/make-standalone-icon.js');
+  const iconSource = path.join(root, 'standalone', 'renderer', 'icon-source.png');
   assert.equal(pkg.scripts['icon:standalone'], 'electron scripts/make-standalone-icon.js');
   assert.equal(pkg.scripts['prebuild:standalone:portable'], 'npm run icon:standalone');
   assert.equal(pkg.scripts['prestart:standalone'], 'npm run icon:standalone');
   assert.match(main, /renderer['"], 'app-icon\.png/);
-  assert.match(iconScript, /DLSS 5 Neural Rendering Manager standalone icon/);
+  assert.match(iconScript, /DLSS 5 Pre-SR Manager standalone icon/);
+  assert.match(iconScript, /icon-source\.png/);
+  assert.match(iconScript, /nativeImage\.createFromPath\(SOURCE_ICON\)/);
   assert.match(iconScript, /build\/icon\.ico|icon\.ico/);
   assert.match(iconScript, /app-icon\.png/);
-  assert.match(iconScript, /id="five"/);
-  assert.match(iconScript, /M318 286H775L733 386H430/);
-  assert.match(iconScript, /id="blade"/);
-  assert.doesNotMatch(iconScript, /M246 674V350L454 674V350H626/);
+  assert.ok(fs.existsSync(iconSource), 'approved icon source is committed');
+  assert.ok(fs.statSync(iconSource).size > 1000, 'approved icon source is a non-empty PNG');
 });
 
 test('settings includes a Buy Me a Coffee support card with a bundled QR code', () => {
