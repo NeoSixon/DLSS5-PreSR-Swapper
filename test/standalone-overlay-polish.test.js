@@ -64,7 +64,7 @@ test('manager backend revision is mgr9 everywhere user-facing update detection r
     'standalone/core/optiscaler.js',
     'standalone/renderer/home-compat.js'
   ]) {
-    assert.match(read(rel), /0\.7\.7-dlss5mgr8/, `${rel} should use mgr9`);
+    assert.match(read(rel), /0\.7\.7-dlss5mgr9/, `${rel} should use mgr9`);
   }
 });
 
