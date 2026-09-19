@@ -16,7 +16,8 @@ async function runLibraryUISmoke() {
     card(id).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
     await new Promise(resolve => setTimeout(resolve, 60));
   };
-  await waitFor(() => card('a') && card('b'));
+  showPage('games');
+  await waitFor(() => currentPage === 'games' && card('a') && card('b'));
   check(document.querySelector('.library-game-card').dataset.gameId === 'b', 'Favorites must be first');
   check(!card('c'), 'Hidden game leaked into All');
   await menu('a', 'favorite');
