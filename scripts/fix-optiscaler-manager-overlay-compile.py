@@ -506,7 +506,7 @@ def main() -> int:
         if (!enabled)
             ImGui::TextDisabled("Off");
         else if (running)
-            ImGui::TextColored(ImVec4(0.463f, 0.725f, 0.000f, 1.0f), "%s - %d pass%s",
+            ImGui::TextColored(ImVec4(0.502f, 0.780f, 0.016f, 1.0f), "%s - %d pass%s",
                                beforeSr ? "Pre-SR active" : "After-SR active", passes, passes == 1 ? "" : "es");
         else
             ImGui::TextColored(ImVec4(0.90f, 0.72f, 0.34f, 1.0f), "Waiting for DLSS / rendered scene");'''
@@ -517,9 +517,9 @@ def main() -> int:
         {
             const char* mode = beforeSr ? tr("Pre-SR active", "Pre-SR 已启用") : tr("After-SR active", "后置 NR 已启用");
             if (zh)
-                ImGui::TextColored(ImVec4(0.463f, 0.725f, 0.000f, 1.0f), "%s · %d 层", mode, passes);
+                ImGui::TextColored(ImVec4(0.502f, 0.780f, 0.016f, 1.0f), "%s · %d 层", mode, passes);
             else
-                ImGui::TextColored(ImVec4(0.463f, 0.725f, 0.000f, 1.0f), "%s · %d pass%s", mode, passes, passes == 1 ? "" : "es");
+                ImGui::TextColored(ImVec4(0.502f, 0.780f, 0.016f, 1.0f), "%s · %d pass%s", mode, passes, passes == 1 ? "" : "es");
         }
         else
             ImGui::TextColored(ImVec4(0.90f, 0.72f, 0.34f, 1.0f), "%s", tr("Waiting for DLSS / rendered scene", "等待 DLSS / 3D 场景"));'''

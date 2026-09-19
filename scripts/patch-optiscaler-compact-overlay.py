@@ -237,14 +237,14 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.106f, 0.110f, 0.118f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.188f, 0.196f, 0.212f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.568f, 0.839f, 0.106f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.573f, 0.855f, 0.086f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.125f, 0.129f, 0.141f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.165f, 0.173f, 0.188f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.196f, 0.208f, 0.227f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.153f, 0.220f, 0.051f, 0.90f));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.208f, 0.306f, 0.071f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.463f, 0.725f, 0.000f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.568f, 0.839f, 0.106f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.165f, 0.239f, 0.031f, 0.90f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.208f, 0.322f, 0.039f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.502f, 0.780f, 0.016f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.573f, 0.855f, 0.086f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.133f, 0.141f, 0.157f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.165f, 0.173f, 0.188f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.204f, 0.216f, 0.231f, 1.0f));
@@ -281,7 +281,7 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         const float titleX = brandAt.x;
         const float titleY = brandAt.y + (headerHeight - dlssSize.y) * 0.5f;
         const ImU32 titleColor = ImGui::GetColorU32(ImVec4(0.92f, 0.95f, 0.96f, 1.0f));
-        const ImU32 fiveColor = ImGui::GetColorU32(ImVec4(0.568f, 0.839f, 0.106f, 1.0f));
+        const ImU32 fiveColor = ImGui::GetColorU32(ImVec4(0.573f, 0.855f, 0.086f, 1.0f));
 
         // Product identity stays simple: DLSS is light, the attached 5 carries the accent.
         draw->AddText(ImVec2(titleX, titleY), titleColor, "DLSS");
@@ -333,7 +333,7 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
             const bool selected = passes == pass;
             if (selected)
             {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.463f, 0.725f, 0.000f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.502f, 0.780f, 0.016f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.529f, 0.792f, 0.067f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.02f, 0.06f, 0.02f, 1.0f));
             }
@@ -673,7 +673,7 @@ static void RenderDlss5ManagerOverlay(TContext& ctx)
         if (!enabled)
             ImGui::TextDisabled("Off");
         else if (running)
-            ImGui::TextColored(ImVec4(0.463f, 0.725f, 0.000f, 1.0f), "%s - %d pass%s",
+            ImGui::TextColored(ImVec4(0.502f, 0.780f, 0.016f, 1.0f), "%s - %d pass%s",
                                beforeSr ? "Pre-SR active" : "After-SR active", passes, passes == 1 ? "" : "es");
         else
             ImGui::TextColored(ImVec4(0.90f, 0.72f, 0.34f, 1.0f), "Waiting for DLSS / rendered scene");

@@ -18,9 +18,9 @@ This standalone app is intentionally separate from the original DLSS5-Swapper pr
 - Detect `nvngx_dlssnr.dll` beside the game or reuse a previously imported local cache.
 - Back up and restore files managed by this app.
 - English and Simplified Chinese UI.
-- The mgr18 overlay stays inside the current screen bounds at the selected scale; style labels have reserved space and all active advanced passes default open.
+- The mgr20 overlay stays inside the current screen bounds at the selected scale; style labels have reserved space and all active advanced passes default open.
 
-To apply mgr18 to an existing managed game, close the game, open it in the new manager build and choose **Update in-game backend**, then restart the game. Installing a newer manager alone does not replace a backend already copied into a game folder.
+To apply mgr20 to an existing managed game, close the game, open it in the new manager build and choose **Update in-game backend**, then restart the game. Installing a newer manager alone does not replace a backend already copied into a game folder.
 
 ## Runtime policy
 
