@@ -249,7 +249,6 @@ def main() -> int:
         ('ImGui::TextDisabled("Finished-picture mode requires native DirectX 12.");', 'ImGui::TextDisabled("%s", tr("Finished-picture mode requires native DirectX 12.", "最终画面模式需要原生 DirectX 12。"));', 'finished picture hint'),
         ('ImGui::Checkbox("Apply effect (A/B preview)", &applyModel)', 'ImGui::Checkbox(tr("Apply effect (A/B preview)", "应用效果（A/B 对比）"), &applyModel)', 'A/B checkbox'),
         ('ImGui::SetTooltip("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.");', 'ImGui::SetTooltip("%s", tr("Turn off to compare before/after. Neural Rendering still runs and keeps its GPU cost.", "关闭可对比前后效果；神经渲染仍会运行并保持 GPU 开销。"));', 'A/B tooltip'),
-        ('ImGui::SetTooltip("Restore the Pass 1 setting.");', 'ImGui::SetTooltip("%s", tr("Restore the Pass 1 setting.", "恢复为第 1 层设置。"));', 'auto mask restore tooltip'),
         ('ImGui::CollapsingHeader("Experimental")', 'ImGui::CollapsingHeader(tr("Experimental", "实验性"))', 'experimental header'),
         ('"Experimental - may cause artifacts, latency, or require restart.");', '"%s", tr("Experimental - may cause artifacts, latency, or require restart.", "实验性功能 - 可能产生伪影、延迟，或需要重启游戏。"));', 'experimental warning'),
         ('ImGui::Checkbox("Carry Pre-SR edit across Ray Reconstruction", &residualAcrossRr)', 'ImGui::Checkbox(tr("Carry Pre-SR edit across Ray Reconstruction", "将 Pre-SR 编辑保留到光线重建"), &residualAcrossRr)', 'RR residual'),
