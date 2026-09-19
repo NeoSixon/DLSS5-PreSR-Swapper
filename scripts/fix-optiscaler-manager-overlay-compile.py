@@ -281,9 +281,14 @@ def main() -> int:
                 DlssNr::RetryAfterFailure();
                 changed = true;
             }
-            hoverHelp(
-                "Run NR at the smaller input resolution, upscale the NR changes with DLSS, then apply them to the finished image. Experimental; requires native DX12 + DLSS SR and does not support Ray Reconstruction.",
-                "先在较低输入分辨率运行 NR，再用 DLSS 放大 NR 产生的变化，最后叠加到超分后的最终画面。属于实验功能；仅支持原生 DX12 + DLSS SR，不支持光线重建。");
+            if (beforeSr)
+                hoverHelp(
+                    "With Pre-SR enabled, NR runs at input resolution but does not modify the game image there. Its saved changes are upscaled separately with DLSS and applied only to the finished picture. Experimental; requires native DX12 + DLSS SR and does not support Ray Reconstruction.",
+                    "当前已开启 Pre-SR：NR 会在输入分辨率计算，但不会直接改动超分前的游戏画面；它只保存 NR 产生的变化，随后单独用 DLSS 放大，并在最终画面阶段再叠加。属于实验功能；仅支持原生 DX12 + DLSS SR，不支持光线重建。");
+            else
+                hoverHelp(
+                    "With Pre-SR disabled, NR runs directly on the finished picture after the game's lighting and effects. This can reduce green-noise artifacts in some games. Native DX12 only.",
+                    "当前未开启 Pre-SR：NR 会直接作用于游戏完成光照、特效和超分后的最终画面。某些游戏中这可以减少绿色噪点等伪影。仅支持原生 DX12。");
             ImGui::EndDisabled();''',
         "finished-picture hover help")
 
