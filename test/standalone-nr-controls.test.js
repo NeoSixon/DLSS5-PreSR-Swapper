@@ -39,6 +39,33 @@ test('NR settings bridge reads and writes existing OptiScaler config', (t) => {
   assert.equal(after.runBeforeSR, false);
 });
 
+test('Chinese overlay replaces OptiScaler auto font with an available CJK font', (t) => {
+  const nrSettings = require(path.join(root, 'standalone/core/nr-settings'));
+  const ini = require(path.join(root, 'standalone/core/ini'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dlssnr-cjk-'));
+  const windowsDir = path.join(dir, 'Windows');
+  const fontsDir = path.join(windowsDir, 'Fonts');
+  fs.mkdirSync(fontsDir, { recursive: true });
+  fs.writeFileSync(path.join(fontsDir, 'msyh.ttc'), 'fake-font');
+  const exe = path.join(dir, 'Game.exe');
+  const config = path.join(dir, 'OptiScaler.ini');
+  fs.writeFileSync(exe, 'x');
+  fs.writeFileSync(config, '[Menu]\\r\\nTTFFontPath=auto\\r\\n', 'utf8');
+
+  const previousWindir = process.env.WINDIR;
+  process.env.WINDIR = windowsDir;
+  t.after(() => {
+    if (previousWindir === undefined) delete process.env.WINDIR;
+    else process.env.WINDIR = previousWindir;
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  assert.equal(nrSettings.applyOverlayLanguage(exe, 'zh-CN'), true);
+  const text = fs.readFileSync(config, 'utf8');
+  assert.equal(ini.get(text, 'Menu', 'DLSS5ManagerLanguage'), 'zh-CN');
+  assert.equal(ini.get(text, 'Menu', 'TTFFontPath'), path.join(fontsDir, 'msyh.ttc'));
+});
+
 test('compact overlay preferences write shortcut, scale, opacity and position', (t) => {
   const nrSettings = require(path.join(root, 'standalone/core/nr-settings'));
   const ini = require(path.join(root, 'standalone/core/ini'));
